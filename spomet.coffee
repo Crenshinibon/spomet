@@ -15,4 +15,4 @@ if Meteor.isServer
     'some fun called'
 
 @test_package = () ->
-    
+    Spomet.find('')
