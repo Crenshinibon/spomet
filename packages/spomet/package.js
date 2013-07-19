@@ -7,7 +7,9 @@ Package.on_use(function (api) {
    api.add_files('server_collections.coffee','server');
    api.add_files('shared_collections.coffee',['server','client']);
    
-   api.add_files('index.coffee','server');
+   api.add_files('server.coffee','server');
+   api.add_files('layers/threegram.coffee','server');
+   
    api.add_files('client.coffee','client');
    api.add_files('search_field.html','client');
    

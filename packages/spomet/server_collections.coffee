@@ -3,7 +3,7 @@
 # - an index by word, (eventually stemming )
 ###
 @WordIndex = new Meteor.Collection('spomet-wordindex')
-@NGramIndex = new Meteor.Collection('spomet-ngramindex')
+
 
 
 ###
