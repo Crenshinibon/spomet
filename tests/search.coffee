@@ -7,8 +7,8 @@ suite 'Searches', () ->
             e1 = new Spomet.Findable 'this should be easily found', '1'
             e2 = new Spomet.Findable 'much more harder to find', '2'
             
-            Spomet.index e1
-            Spomet.index e2
+            Spomet.add e1
+            Spomet.add e2
             emit 'indexed', e1, e2
         
         server.once 'indexed', (e1, e2) ->

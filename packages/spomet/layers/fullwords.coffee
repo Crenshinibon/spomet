@@ -29,7 +29,7 @@ Spomet.FullWordIndex =
                         
                         docId = e.path + e.base + e.version                        
                         unless results[docId]?
-                            results[docId] = new Spomet.Result e.version, e.base, e.path, score
+                            results[docId] = new Spomet.Result docId, e.version, e.base, e.path, score
                         else
                             results[docId].score += score
         _.values results
@@ -83,4 +83,4 @@ Spomet.FullWordIndex =
             else
                 @collection.insert {term: key, documents: [doc]}
                  
-        callback?("Document: #{doc.base}#{doc.path} indexed.")
+        callback?("Document: #{doc.base}#{doc.path} added to word index.")
