@@ -27,9 +27,9 @@ Spomet.FullWordIndex =
                             documentsCountWithTerm) 
                         score = score * Spomet.FullWordIndex.layerBoost / _.values(tokens).length * value / mostCommonTermCountQuery
                         
-                        docId = e.path + e.base + e.version                        
+                        docId = Spomet.documentId e.version, e.base, e.path            
                         unless results[docId]?
-                            results[docId] = new Spomet.Result docId, e.version, e.base, e.path, score
+                            results[docId] = new Spomet.Result e.version, e.base, e.path, score
                         else
                             results[docId].score += score
         _.values results

@@ -1,25 +1,23 @@
 assert = require 'assert'
 
-suite 'Searches', () ->
-    test 'find something', (done, server, client) ->
+suite 'Server Find', () ->
+    test 'find something', (done, server) ->
         
         server.eval () ->
-            e1 = new Spomet.Findable 'this should be easily found', '1'
-            e2 = new Spomet.Findable 'much more harder to find', '2'
+            Spomet.LatestPhrases.remove {}
+            Spomet.CurrentSearch.remove {}
+            
+            e1 = new Spomet.Findable 'this should be easily found', '/', 'OID1', '0.1'
+            e2 = new Spomet.Findable 'much more harder to find', '/', 'OID2', '0.1'
             
             Spomet.add e1
             Spomet.add e2
-            emit 'indexed', e1, e2
+            
+            Spomet.find 'much more', 'user', (m, d) ->
+                emit 'callback', m, d
         
-        server.once 'indexed', (e1, e2) ->
-            console.log e1
-            console.log e2
-
-        client.eval () ->
-            Spomet.find 'easily found', (error, e) ->
-                emit 'return', e
-        
-        client.once 'return', (res) ->
-            console.log res
-            assert.equal res.length, 1
-            done()
+        server.on 'callback', (message, d) ->
+            console.log message, d
+            
+            if message is 'Complete'
+                done()

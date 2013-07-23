@@ -30,9 +30,9 @@ Spomet.WordGroupIndex =
                             documentsCountWithTerm) 
                         score = score * Spomet.WordGroupIndex.layerBoost / Math.log _.values(tokens).length
                         
-                        docId = e.path + e.base + e.version                        
+                        docId = Spomet.documentId e.version, e.base, e.path            
                         unless results[docId]?
-                            results[docId] = new Spomet.Result docId, e.version, e.base, e.path, score
+                            results[docId] = new Spomet.Result e.version, e.base, e.path, score
                         else
                             results[docId].score += score
         _.values results
@@ -41,7 +41,10 @@ Spomet.WordGroupIndex =
         tokens = {}
         
         addToken = (token) ->
-            if tokens[token]? then tokens[token] += 1 else tokens[token] = 1
+            if tokens[token]? 
+                tokens[token] += 1 
+            else 
+                tokens[token] = 1
         
         words = text.split(' ')
         if words.length > 1
@@ -49,7 +52,8 @@ Spomet.WordGroupIndex =
             for i in [1 .. words.length]
                 cur = words[i]
                 addToken prev + cur
-                if incReverse? then addToken cur + prev
+                if incReverse? 
+                    addToken cur + prev
                 prev = cur
         tokens
         
@@ -58,7 +62,6 @@ Spomet.WordGroupIndex =
         text = text.toLowerCase().replace /[^a-z'äüö]/g, ' '
         text = text.replace /\s{2,}/g, ' '
         text
-
     
     mostCommonTermCount: (tokens) ->
         count = 1

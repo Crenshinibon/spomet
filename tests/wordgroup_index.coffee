@@ -88,7 +88,7 @@ suite 'WordGroup', () ->
             assert.equal 0, r.length
             
         server.once 'found', (r) ->
-            console.log r
+            #console.log r
             assert.equal 2, r.length
             done()
             

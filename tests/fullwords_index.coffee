@@ -70,7 +70,7 @@ suite 'FullWords', () ->
             assert.equal 0, r.length
             
         server.once 'searched2', (r) ->
-            console.log r
+            #console.log r
             assert.equal 2, r.length
             done()
             
