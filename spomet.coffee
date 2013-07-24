@@ -1,3 +1,4 @@
+
 if Meteor.isClient
     Template.hello.greeting = () ->
         'Welcome to spomet.'

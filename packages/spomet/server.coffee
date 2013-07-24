@@ -45,6 +45,13 @@ Spomet.remove = (delEntity) ->
 Spomet.shrink = () ->
         
 Spomet.rebuilt = (validEntities) ->
+    
+Spomet.reset = () ->
+    Spomet.LatestPhrases.remove {}
+    Spomet.CurrentSearch.remove {}
+    Spomet.ThreeGramIndex.collection.remove {}
+    Spomet.FullWordIndex.collection.remove {}
+    Spomet.WordGroupIndex.collection.remove {}
         
 Spomet.documentId = (base, path, version) ->
     base + path + version
@@ -64,3 +71,9 @@ Meteor.methods(
     spomet_add: (findable) ->
         Spomet.add(findable)
 )
+
+Meteor.publish 'current-search-results', () ->
+    Spomet.CurrentSearch.find {user: @userId}, {sort: {rank: 1}}
+
+Meteor.publish 'latest-phrases', () ->
+    Spomet.LatestPhrases.find {user: @userId}, {sort: {queried: -1}}, limit: 20

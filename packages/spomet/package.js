@@ -11,13 +11,13 @@ Package.on_use(function (api) {
    api.add_files('shared_collections.coffee',['server','client']);
    
    api.add_files('server.coffee','server');
-   
-   api.add_files('layers/shared.coffee','server');
-   api.add_files('layers/threegram.coffee','server');
-   api.add_files('layers/fullwords.coffee','server');
-   api.add_files('layers/wordgroup.coffee','server');
-   
    api.add_files('client.coffee','client');
+   
+   api.add_files('indexes/shared.coffee','server');
+   api.add_files('indexes/threegram.coffee','server');
+   api.add_files('indexes/fullwords.coffee','server');
+   api.add_files('indexes/wordgroup.coffee','server');
+   
    api.add_files('search_field.html','client');
    
 });
