@@ -52,22 +52,12 @@ Spomet.reset = () ->
     Spomet.ThreeGramIndex.collection.remove {}
     Spomet.FullWordIndex.collection.remove {}
     Spomet.WordGroupIndex.collection.remove {}
-        
-Spomet.documentId = (base, path, version) ->
-    base + path + version
-
-class Spomet.Findable
-    @version: '0.1'
-    constructor: (@text, @path, @base, @version) ->
-
-class Spomet.Result
-    constructor: (@version, @base, @path, @score) ->
-        @docId = Spomet.documentId @base, @path, @version
-
-
+    
 Meteor.methods(
     spomet_find: (phrase) ->
-        Spomet.find(phrase, @userId)
+        unless @userId?
+            Spomet.find phrase, 'anon'
+        Spomet.find phrase, @userId
     spomet_add: (findable) ->
         Spomet.add(findable)
 )

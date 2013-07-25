@@ -1,16 +1,17 @@
 
 if Meteor.isClient
-    Template.hello.greeting = () ->
-        'Welcome to spomet.'
+    Template.addable.posts = () ->
+        Posts.find({indexed: false})
 
-    Template.hello.events(
+    Template.addable.events(
         'click input' : () ->
-            console?.log 'You pressed the button'
+            Spomet.add new Spomet.Findable this.title, '/title', this._id, '0.1'
+            Spomet.add new Spomet.Findable this.text, '/text', this._id, '0.1'
+            Posts.update {_id: this._id},{$set: {indexed: true}}
     )
 
 if Meteor.isServer
     Meteor.startup () ->
-
 
 @some_fun = () ->
     'some fun called'

@@ -3,11 +3,35 @@
 </head>
 
 <body>
-  {{> hello}}
+    <div class='container-fluid offset1 span10'>
+    <div class='row-fluid'>
+    <h1>Welcome to Spomet</h1>
+    <p>Spomet is the contraction of Spotting Meteors.</p><p>It is a simple, but for many cases sufficient, search engine for Meteor. It should be easily includable into your Meteor project. You simply take the package from Spomets GitHub repository and put it into your app's packages folder.</p><p>This page should serve as an example how to actually use it inside your app.</p><p>The current implementation uses three simple indexes, that should balance precision and recall. There haven't been many tests yet. So future updates will fine tune the parameters and introduce further indexes. Currently there is a 3gram based index, a simple word index and a wordgroup index. Whereas wordgroups are groups of two words.</p><p>Future enhancements might include stemming, algorithm based (e.g. Porter) or based on a lexikon.</p>
+    <p>There are tests. Laika tests, written in CoffeeScript. So to execute those. You need a few additional things. A local MongoDB installation, Phantom.js and of course CoffeeScript. Run the tests from the project root with:</p><pre>laika --compilers coffee:coffee-script</pre>
+    </div>
+    <div class='row-fluid container-fluid'>
+        <div class='span6'>
+        {{> addable}}
+        </div>
+        <div class='span6'>
+        {{> search}}
+        </div>
+    </div>
+    </div>
 </body>
 
-<template name="hello">
-  <h1>Hello World!</h1>
-  {{greeting}}
-  <input type="button" value="Click" />
+<template name="addable">
+    {{#each posts}}
+    <div style="float:right"><input type="button" class="btn" value="Make Searchable"></div>
+    <p><b>{{this.title}}</b></p>
+    <p>{{this.text}}</p>
+    {{/each}}
+</template>
+
+<template name="search">
+    {{> spometSearchForm}}
+    <div class="row-fluid">
+        {{#each results}}
+        {{/each}}
+    </div>
 </template>
