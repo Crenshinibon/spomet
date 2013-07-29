@@ -6,5 +6,5 @@ Spomet.LatestPhrases = new Meteor.Collection('spomet-latestphrases')
 ###
 # This collection stores the results of the current search by user
 ###
-Spomet.CurrentSearch = new Meteor.Collection('spomet-currentresults')
+Spomet.CurrentSearch = new Meteor.Collection('spomet-currentsearch')
 

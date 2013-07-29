@@ -8,10 +8,13 @@ suite '3Gram', () ->
             emit 'tokens', a
         
         server.once 'tokens', (t) ->
+            assert.ok not t['  d']?
             assert.equal t[' da'], 1
             assert.equal t['das'], 1
             assert.equal t['ein'], 2
             assert.equal t['xt '], 1
+            assert.ok not t['t  ']?
+            assert.ok not t['']?
             done()
             
     test 'normalize', (done, server) ->
@@ -54,13 +57,12 @@ suite '3Gram', () ->
             f3 = new Spomet.Findable 'I can\'help but pity you. Ex Ex Ex. Te, Te, Te. You shoul pull yourself togther, though.', '/', 'SOMEID2', '0.1'
             f4 = new Spomet.Findable 'This is some text to be searched for', '/title', 'SOMEID3', '0.1'
             
-            Spomet.ThreeGramIndex.add f1
-            Spomet.ThreeGramIndex.add f2
-            Spomet.ThreeGramIndex.add f3
-            Spomet.ThreeGramIndex.add f4
-            
-            results = Spomet.ThreeGramIndex.find('ext')
-            emit 'searched', results
+            Spomet.ThreeGramIndex.add f1, () ->
+                Spomet.ThreeGramIndex.add f2, () ->
+                    Spomet.ThreeGramIndex.add f3, () ->
+                        Spomet.ThreeGramIndex.add f4, () ->
+                            results = Spomet.ThreeGramIndex.find('ext')
+                            emit 'searched', results
             
         server.once 'searched', (r) ->
             assert.equal 3, r.length

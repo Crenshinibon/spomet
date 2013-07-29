@@ -29,9 +29,18 @@
 </template>
 
 <template name="search">
-    {{> spometSearchForm}}
+    {{> spometSearch}}
+    {{#each results}}
+    {{> result}}
+    {{/each}}
+</template>
+
+<template name="result">
     <div class="row-fluid">
-        {{#each results}}
-        {{/each}}
+        <span class="span4">Score: <b>{{score}}</b></span>
+        <span class="span8">Title: <b>{{title}}</b></span>
+    </div>
+    <div class="row-fluid">
+        <p>{{text}}</p>
     </div>
 </template>

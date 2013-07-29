@@ -8,23 +8,61 @@ Spomet.find = (phrase, userId, callback) ->
     #clear latest search
     Spomet.CurrentSearch.remove {user: userId}
     
+    resAccumulator =
+        allFinished: () ->
+            @wgf and @fwf and @tgf
+        wgf: false
+        fwf: false
+        tgf: false
+    
     #built up new results set
     seen = {}
-    Spomet.WordGroupIndex.find(phrase).forEach (e) ->
-        Spomet.searchResultAddOrAppend(e, userId, seen)
-        callback?('Found by WordGroup:', e)
-    Spomet.FullWordIndex.find(phrase).forEach (e) ->
-        Spomet.searchResultAddOrAppend(e, userId, seen)
-        callback?('Found by FullWord:', e)
-    Spomet.ThreeGramIndex.find(phrase).forEach (e) ->
-        Spomet.searchResultAddOrAppend(e, userId, seen)
-        callback?('Found by ThreeGram', e)
     
-    callback?('Complete', seen)
+    wgr = Spomet.WordGroupIndex.find(phrase)
+    if wgr.length is 0
+        resAccumulator.wgf = true
+        
+    wgr.forEach (e) ->
+        Spomet.searchResultAddOrAppend e, userId, seen, (error, result) ->
+            unless error
+                resAccumulator.wgf = true
+                if resAccumulator.allFinished()
+                    callback?('Complete', seen)
+            else
+                callback?('Error', error)
+                console.log error
     
-Spomet.searchResultAddOrAppend = (result, userId, seen) ->
+    fwr = Spomet.FullWordIndex.find(phrase)
+    if fwr.length is 0
+        resAccumulator.fwf = true
+    
+    fwr.forEach (e) ->
+        Spomet.searchResultAddOrAppend e, userId, seen, (error, result) ->
+            unless error
+                resAccumulator.fwf = true
+                if resAccumulator.allFinished()
+                    callback?('Complete', seen)
+            else
+                callback?('Error', error)
+                console.log error
+                
+    tgr = Spomet.ThreeGramIndex.find(phrase)
+    if tgr.length is 0
+        resAccumulator.tgf = true
+    
+    tgr.forEach (e) ->
+        Spomet.searchResultAddOrAppend e, userId, seen, (error, result) ->
+            unless error
+                resAccumulator.tgf = true
+                if resAccumulator.allFinished()
+                    callback?('Complete', seen)
+            else
+                callback?('Error', error)
+                console.log error
+    
+Spomet.searchResultAddOrAppend = (result, userId, seen, cb) ->
     if seen[result.docId]?
-        Spomet.CurrentSearch.update {docId: result.docId, user: userId}, {$inc: {score: result.score}}
+        Spomet.CurrentSearch.update {docId: result.docId, user: userId}, {$inc: {score: result.score}}, cb
     else
         Spomet.CurrentSearch.insert
             user: userId
@@ -33,12 +71,14 @@ Spomet.searchResultAddOrAppend = (result, userId, seen) ->
             base: result.base
             path: result.path
             version: result.version
+        , cb
         seen[result.docId] = 1
 
-Spomet.add = (findable) ->
-    Spomet.ThreeGramIndex.add(findable)
-    Spomet.FullWordIndex.add(findable)
-    Spomet.WordGroupIndex.add(findable)
+Spomet.add = (findable, callback) ->
+    Spomet.ThreeGramIndex.add findable, () ->
+        Spomet.FullWordIndex.add findable, () ->
+            Spomet.WordGroupIndex.add findable, () ->
+                callback?("Added to all indexes.")
         
 Spomet.remove = (delEntity) ->
     
@@ -55,15 +95,16 @@ Spomet.reset = () ->
     
 Meteor.methods(
     spomet_find: (phrase) ->
-        unless @userId?
+        if @userId?
+            Spomet.find phrase, @userId
+        else
             Spomet.find phrase, 'anon'
-        Spomet.find phrase, @userId
     spomet_add: (findable) ->
         Spomet.add(findable)
 )
 
 Meteor.publish 'current-search-results', () ->
-    Spomet.CurrentSearch.find {user: @userId}, {sort: {rank: 1}}
+    Spomet.CurrentSearch.find {user: @userId}, {sort: [['score','desc']], limit: 10}
 
 Meteor.publish 'latest-phrases', () ->
-    Spomet.LatestPhrases.find {user: @userId}, {sort: {queried: -1}}, limit: 20
+    Spomet.LatestPhrases.find {user: @userId}, {sort: [['queried','desc']], limit: 20}

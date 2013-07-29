@@ -3,18 +3,25 @@ if Meteor.isClient
     Template.addable.posts = () ->
         Posts.find({indexed: false})
 
-    Template.addable.events(
+    Template.search.results = () ->
+        Spomet.CurrentSearch.find()
+        
+    Template.result.score = () ->
+        @score.toFixed 4
+        
+    Template.result.title = () ->
+        p = Posts.findOne {_id: @base}
+        if p? then p.title else 'deleted'
+        
+    Template.result.text = () ->
+        p = Posts.findOne {_id: @base}
+        if p? then p.text else 'deleted' 
+        
+    Template.addable.events
         'click input' : () ->
             Spomet.add new Spomet.Findable this.title, '/title', this._id, '0.1'
             Spomet.add new Spomet.Findable this.text, '/text', this._id, '0.1'
             Posts.update {_id: this._id},{$set: {indexed: true}}
-    )
 
 if Meteor.isServer
     Meteor.startup () ->
-
-@some_fun = () ->
-    'some fun called'
-
-@test_package = () ->
-    Spomet.find('')

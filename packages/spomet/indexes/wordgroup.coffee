@@ -13,7 +13,7 @@ Spomet.WordGroupIndex =
     lookupAndRate: (tokens) ->
         results = {}
         
-        mostCommonTermCountQuery = @mostCommonTermCount tokens
+        mostCommonTermCountQuery = Spomet.Index.mostCommonTermCount tokens
         meta = @collection.findOne {type: 'meta'}
         if meta?
             for own key, value of tokens
@@ -30,7 +30,7 @@ Spomet.WordGroupIndex =
                             documentsCountWithTerm) 
                         score = score * Spomet.WordGroupIndex.layerBoost / Math.log _.values(tokens).length
                         
-                        docId = Spomet.documentId e.version, e.base, e.path            
+                        docId = Spomet.documentId e.version, e.base, e.path
                         unless results[docId]?
                             results[docId] = new Spomet.Result e.version, e.base, e.path, score
                         else
@@ -41,9 +41,9 @@ Spomet.WordGroupIndex =
         tokens = {}
         
         addToken = (token) ->
-            if tokens[token]? 
+            if tokens[token]?
                 tokens[token] += 1 
-            else 
+            else
                 tokens[token] = 1
         
         words = text.split(' ')
@@ -52,7 +52,7 @@ Spomet.WordGroupIndex =
             for i in [1 .. words.length]
                 cur = words[i]
                 addToken prev + cur
-                if incReverse? 
+                if incReverse?
                     addToken cur + prev
                 prev = cur
         tokens
@@ -61,41 +61,16 @@ Spomet.WordGroupIndex =
     normalize: (text) ->
         text = text.toLowerCase().replace /[^a-z'äüö]/g, ' '
         text = text.replace /\s{2,}/g, ' '
-        text
-    
-    mostCommonTermCount: (tokens) ->
-        count = 1
-        for own key, value of tokens
-                if value > count
-                    count = value
-        count
+        text.trim()
     
     add: (findable, callback) ->
+        iCallback = (message, error) ->
+            callback?("Document: #{findable.base}#{findable.path} added to WordGroup index.")
+            
         normed = @normalize findable.text
         tokens = @tokenize normed
+        
         if _.values(tokens).length > 1
-            meta = @collection.findOne {type: 'meta'}
-            if meta?
-                @collection.update {_id: meta._id}, {$inc: {documentsCount: 1}}
-            else
-                @collection.insert {type: 'meta', documentsCount: 1}
-        
-            doc =
-                base: findable.base
-                path: findable.path
-                version: findable.version
-                mostCommonTermCount: @mostCommonTermCount tokens
-                documentLength: normed.length
-        
-            for own key, value of tokens
-                term = @collection.findOne {term: key}
-            
-                doc.currentTermCount = value
-                if term?
-                    @collection.update {_id: term._id}, {$push: {documents: doc}}
-                else
-                    @collection.insert {term: key, documents: [doc]}
-                 
-            callback?("Document: #{doc.base}#{doc.path} added to WordGroup index.")
+            Spomet.Index.add findable, normed, tokens, @collection, iCallback
         else
             callback?("Document: #{findable.base}#{findable.path} NOT indexed. It contains only one word.")

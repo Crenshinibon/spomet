@@ -33,15 +33,17 @@ suite 'FullWords', () ->
             f = new Spomet.Findable 'This is some text to be searched for', '/', 'SOMEID', '0.1'
             Spomet.FullWordIndex.add f, (message) ->
                 elements = Spomet.FullWordIndex.collection.find {term: {$ne: null}}
+                emit 'message', message
                 emit 'size', elements.count()
                 emit 'elements', elements.fetch()
+        
+        server.once 'message', (m) ->
+            console.log m
         
         server.once 'size', (i) ->
             assert.ok i > 0
             
         server.once 'elements', (e) ->
-            #e.forEach (e) ->
-            #    console.log e 
             assert.equal e[1].documents[0].base, 'SOMEID'
             done()
             
@@ -55,16 +57,41 @@ suite 'FullWords', () ->
             f3 = new Spomet.Findable 'I can\'t help but pity you. Ex Ex Ex. Te, Te, Te. You shoul pull yourself togther, though.', '/', 'SOMEID2', '0.1'
             f4 = new Spomet.Findable 'This is some text to be searched for', '/title', 'SOMEID3', '0.1'
             
-            Spomet.FullWordIndex.add f1
-            Spomet.FullWordIndex.add f2
-            Spomet.FullWordIndex.add f3
-            Spomet.FullWordIndex.add f4
+            Spomet.FullWordIndex.add f1, () ->
+                emit 'f1added', Spomet.FullWordIndex.collection.find({term: {$ne: null}}).fetch()
+                Spomet.FullWordIndex.add f2, () ->
+                    emit 'f2added', Spomet.FullWordIndex.collection.find({term: {$ne: null}}).fetch()
+                    Spomet.FullWordIndex.add f3, () ->
+                        emit 'f3added', Spomet.FullWordIndex.collection.find({term: {$ne: null}}).fetch()
+                        Spomet.FullWordIndex.add f4, () ->
+                            emit 'f4added', Spomet.FullWordIndex.collection.find({term: {$ne: null}}).fetch()
+                            
+                            emit 'meta', Spomet.FullWordIndex.collection.findOne({type: 'meta'})
+                            results = Spomet.FullWordIndex.find('ext')
+                            emit 'searched1', results
             
-            results = Spomet.FullWordIndex.find('ext')
-            emit 'searched1', results
+                            results = Spomet.FullWordIndex.find('text')
+                            emit 'searched2', results
+        
+        server.once 'meta', (r) ->
+            #console.log r
+            assert.equal 4, r.documentsCount
             
-            results = Spomet.FullWordIndex.find('text')
-            emit 'searched2', results
+        server.once 'f1added', (r) ->
+            #console.log r
+            assert.equal 12, r.length
+        
+        server.once 'f2added', (r) ->
+            #console.log r
+            assert.equal 16, r.length
+        
+        server.once 'f3added', (r) ->
+            #console.log r
+            assert.equal 27, r.length
+        
+        server.once 'f4added', (r) ->
+            #console.log r
+            assert.equal 31, r.length        
         
         server.once 'searched1', (r) ->
             assert.equal 0, r.length

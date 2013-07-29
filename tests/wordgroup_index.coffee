@@ -41,7 +41,7 @@ suite 'WordGroup', () ->
         server.once 'normal', (a) ->
             assert.equal a, 'hier kommt ein text mit ähnlichen dingen öü text'
             done()
-                        
+        
     test 'add', (done, server) ->
         
         server.eval () ->
@@ -76,13 +76,12 @@ suite 'WordGroup', () ->
             f3 = new Spomet.Findable 'I can\'help but pity you. Ex Ex Ex. Te, Te, Te. You shoul pull yourself togther, though.', '/', 'SOMEID2', '0.1'
             f4 = new Spomet.Findable 'This is some text to be searched for', '/title', 'SOMEID3', '0.1'
             
-            Spomet.WordGroupIndex.add f1
-            Spomet.WordGroupIndex.add f2
-            Spomet.WordGroupIndex.add f3
-            Spomet.WordGroupIndex.add f4
-            
-            emit 'toshort', Spomet.WordGroupIndex.find('ext')
-            emit 'found', Spomet.WordGroupIndex.find('some is to be')
+            Spomet.WordGroupIndex.add f1, () ->
+                Spomet.WordGroupIndex.add f2, () ->
+                    Spomet.WordGroupIndex.add f3, () ->
+                        Spomet.WordGroupIndex.add f4, () ->
+                            emit 'toshort', Spomet.WordGroupIndex.find('ext')
+                            emit 'found', Spomet.WordGroupIndex.find('some is to be')
             
         server.once 'toshort', (r) ->
             assert.equal 0, r.length
