@@ -7,7 +7,7 @@ Test it [here](http://spomet.meteor.com/ "Spomet hosted at meteor.com")
 
 Spomet is a simple, but for my purpose (and eventually many other's) sufficient, search engine for [Meteor](http://meteor.com "Home of Meteor"). It should be easily includable into your Meteor project. Take the [spomet package](https://github.com/Crenshinibon/spomet/tree/master/packages/spomet "Spomet package") from this GitHub repository's packages folder and put it into your app's packages folder.
 
-This Meteor app, should serve as an example how to actually use it. I tried to make it as simple as possible:
+This Meteor app, should serve as an example how to actually use it. I tried to make this usage as simple as possible:
 
 Include the search box in your template:
     
@@ -17,9 +17,9 @@ Access the results through the CurrentSearch collection:
 
     Spomet.CurrentSearch.find()
 
-The search is user based. As long as their is no logged-in user Spomet uses the user *anon*. Multiple anonymous users do **interfere** with each other. A future version might utilize the Session to separate the users.
+The search is user based. As long as their is no logged-in user Spomet takes the user *anon*. Multiple anonymous users do **interfere** with each other. A future version might utilize the Session to separate anonymous users.
 
-Add documents to the search by calling *add* the method with a *Findable*:
+Add documents to the search by calling the method *add* with a *Findable* instance:
 
     Spomet.add new Spomet.Findable text, path, base, rev
 
@@ -61,7 +61,7 @@ Run the tests from the project's root folder with:
 Warning
 =======
 
-This package is in it's really really early stages. As it should allow for some basic usage, there are many aspects missing. The functionality to remove documents from the index for example. Supporting information to highlight matching aspects of resulting documents is also missing. As well as the performance improvements mentioned above.
+This package is in it's really really early stages. As it should allow for some basic usage, there are many aspects missing. The functionality to remove documents from the index, for example. Supporting information to highlight matching aspects of resulting documents is also missing. As well as the performance improvements mentioned above.
 
 There is of course no guarantee for it's correct functioning.
 
