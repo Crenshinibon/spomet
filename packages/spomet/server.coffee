@@ -75,7 +75,9 @@ Spomet.add = (findable, callback) ->
 Spomet.remove = (delEntity) ->
     
 Spomet.shrink = () ->
-        
+    
+Spomet.discardOutdated = () ->
+    
 Spomet.rebuilt = (validEntities) ->
     
 Spomet.reset = () ->

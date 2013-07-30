@@ -6,9 +6,10 @@
     <div class='container-fluid offset1 span10'>
     <div class='row-fluid'>
     <h1>Welcome to Spomet</h1>
-    <p>Spomet is the contraction of Spotting Meteors.</p><p>It is a simple, but for many cases sufficient, search engine for Meteor. It should be easily includable into your Meteor project. You simply take the package from Spomets GitHub repository and put it into your app's packages folder.</p><p>This page should serve as an example how to actually use it inside your app.</p><p>The current implementation uses three simple indexes, that should balance precision and recall. There haven't been many tests yet. So future updates will fine tune the parameters and introduce further indexes. Currently there is a 3gram based index, a simple word index and a wordgroup index. Whereas wordgroups are groups of two words.</p><p>Future enhancements might include stemming, algorithm based (e.g. Porter) or based on a lexikon.</p>
-    <p>There are tests. Laika tests, written in CoffeeScript. So to execute those. You need a few additional things. A local MongoDB installation, Phantom.js and of course CoffeeScript. Run the tests from the project root with:</p><pre>laika --compilers coffee:coffee-script</pre>
+    <p>Spomet is the contraction of Spotting Meteors.</p><p>It is a simple, but for many cases sufficient, search engine for Meteor. It should be easily includable into your Meteor project. See Spomet's GitHub <a href="https://github.com/Crenshinibon/spomet">repository</a> for more information</p>
     </div>
+    <h2>Test It</h2>
+    <p>Add text (taken from my <a href="http://shiggyenterprises.wordpress.com">blog</a>) from the left side to the index, by using the provided button. Wait a moment, then you should be able to find the document, using the search box on the right.</p>
     <div class='row-fluid container-fluid'>
         <div class='span6'>
         {{> addable}}

@@ -37,10 +37,7 @@ Template.spometSearch.rendered = () ->
             parts = item.phrase.split new RegExp(@query,'i')
             parts.reduce (s, e) ->
                 s + '<span style="color: lightgrey">' + q + '</span>' + e
-            
-Template.spometSearch.preserve
-    'input.spomet-search-field': (node) -> console.log node
-            
+                        
 Template.spometSearch.events
     'submit form': (e) ->
         e.preventDefault()
