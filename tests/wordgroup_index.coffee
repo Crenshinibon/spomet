@@ -47,7 +47,7 @@ suite 'WordGroup', () ->
         server.eval () ->
             Spomet.WordGroupIndex.collection.remove {}
             
-            f = new Spomet.Findable 'This is some text to be searched for', '/', 'SOMEID', '0.1'
+            f = new Spomet.Findable 'This is some text to be searched for', '/', 'SOMEID', 1
             Spomet.WordGroupIndex.add f, (message) ->
                 elements = Spomet.WordGroupIndex.collection.find {term: {$ne: null}}
                 emit 'size', elements.count()
@@ -71,10 +71,10 @@ suite 'WordGroup', () ->
         server.eval () ->
             Spomet.WordGroupIndex.collection.remove {}
             
-            f1 = new Spomet.Findable 'This is some totally different text - with even more text in it.', '/', 'SOMEID1', '0.1'
-            f2 = new Spomet.Findable 'I absolutely disagree with you.', '/comments', 'SOMEID2', '0.1'
-            f3 = new Spomet.Findable 'I can\'help but pity you. Ex Ex Ex. Te, Te, Te. You shoul pull yourself togther, though.', '/', 'SOMEID2', '0.1'
-            f4 = new Spomet.Findable 'This is some text to be searched for', '/title', 'SOMEID3', '0.1'
+            f1 = new Spomet.Findable 'This is some totally different text - with even more text in it.', '/', 'SOMEID1', 1
+            f2 = new Spomet.Findable 'I absolutely disagree with you.', '/comments', 'SOMEID2', 1
+            f3 = new Spomet.Findable 'I can\'help but pity you. Ex Ex Ex. Te, Te, Te. You shoul pull yourself togther, though.', '/', 'SOMEID2', 1
+            f4 = new Spomet.Findable 'This is some text to be searched for', '/title', 'SOMEID3', 1
             
             Spomet.WordGroupIndex.add f1, () ->
                 Spomet.WordGroupIndex.add f2, () ->

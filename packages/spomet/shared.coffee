@@ -2,7 +2,7 @@ Spomet.documentId = (base, path, version) ->
     base + path + version
 
 class Spomet.Findable
-    @version: '0.1'
+    @version: 1
     constructor: (@text, @path, @base, @version) ->
 
 class Spomet.Result
