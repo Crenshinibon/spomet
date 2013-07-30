@@ -1,6 +1,8 @@
 <template name="spometSearch">
     <form class="form-search">
-        <input type="text" class="input-large search-query">
+        <div class="input-append">
+        <input type="text" class="input-large search-query spomet-search-field" autocomplete="off" data-provide="typeahead" value="{{latestPhrase}}">
         <button type="submit" class="btn">Search</button>
+        </div>
     </form>
 </template>

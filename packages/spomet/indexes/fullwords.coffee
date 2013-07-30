@@ -50,7 +50,7 @@ Spomet.FullWordIndex =
          
     add: (findable, callback) ->
         iCallback = (message, error) ->
-            callback?("Document: #{findable.base}#{findable.path} added to word index.")
+            callback? "Document: #{findable.base}#{findable.path} added to word index."
             
         normed = @normalize findable.text
         tokens = @tokenize normed

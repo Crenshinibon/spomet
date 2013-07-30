@@ -6,9 +6,9 @@ suite 'Client Find', () ->
             Spomet.reset()
             Accounts.createUser({email: 'test@test.com', password: '12345'})
             
-            e1 = new Spomet.Findable 'this should be easily found', '/', 'OID1', '0.1'
-            e2 = new Spomet.Findable 'much more harder to find', '/', 'OID2', '0.1'
-            e3 = new Spomet.Findable 'more harder to find, is that really the case', '/', 'OID3', '0.1'
+            e1 = new Spomet.Findable 'this should be easily found', '/', 'OID1', 1
+            e2 = new Spomet.Findable 'much more harder to find', '/', 'OID2', 1
+            e3 = new Spomet.Findable 'more harder to find, is that really the case', '/', 'OID3', 1
             
             Spomet.add e1
             Spomet.add e2

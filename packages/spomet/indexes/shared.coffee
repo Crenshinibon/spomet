@@ -26,47 +26,11 @@ Spomet.Index =
             mostCommonTermCount: @mostCommonTermCount tokens
             documentLength: normed.length
         
-        #reduce the load on the MongoDB ...
-        addToCollectionDelayed = (ikeys) ->
-            ikeys.forEach (key) ->
-                term = collection.findOne {term: key}
-                doc.currentTermCount = tokens[key]
-                if term?
-                    collection.update {_id: term._id}, {$push: {documents: doc}}
-                else
-                    collection.insert {term: key, documents: [doc]}
-        
-        
-        cbCount = 0
-        firstRun = true
-        interval = Meteor.setInterval () ->
-            #console.log cbCount
-            if not firstRun and cbCount is 0
-                callback('Finished')
-                Meteor.clearInterval interval
-        , 20
-        
-        tokKeys = _.keys tokens
-        keys = []
-        tokKeys.forEach (e, i) ->
-            keys.push e
-            if i isnt 0 and i % 10 is 0
-                ikeys = keys.slice()
-                keys = []
-                
-                cbCount += 1
-                firstRun = false
-                
-                Meteor.setTimeout () -> 
-                    addToCollectionDelayed ikeys
-                    cbCount -= 1
-                , i / 2
-            else if i + 1 is tokKeys.length and keys.length > 0
-                    
-                    cbCount += 1
-                    firstRun = false
-                    
-                    Meteor.setTimeout () -> 
-                        addToCollectionDelayed keys
-                        cbCount -= 1
-                    , i / 2
+        _.keys(tokens).forEach (key) ->
+            term = collection.findOne {term: key}
+            doc.currentTermCount = tokens[key]
+            if term?
+                collection.update {_id: term._id}, {$push: {documents: doc}}
+            else
+                collection.insert {term: key, documents: [doc]}
+        callback 'Finished'
