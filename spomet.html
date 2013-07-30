@@ -12,6 +12,7 @@
     <p>Add text (taken from my <a href="http://shiggyenterprises.wordpress.com">blog</a>) from the left side to the index, by using the provided button. Wait a moment, then you should be able to find the document, using the search box on the right.</p>
     <div class='row-fluid container-fluid'>
         <div class='span6'>
+        {{> ownText}}
         {{> addable}}
         </div>
         <div class='span6'>
@@ -27,6 +28,13 @@
     <p><b>{{this.title}}</b></p>
     <p>{{this.text}}</p>
     {{/each}}
+</template>
+
+<template name="ownText">
+    <form>
+    <div style="float:right"><input type="submit" class="btn" value="Make Searchable"></div>
+    <textarea rows="6"></textarea>
+    </form>
 </template>
 
 <template name="search">

@@ -3,13 +3,14 @@ Spomet.WordGroupIndex =
     collection: new Meteor.Collection('spomet-wordgroupindex')
     
     find: (phrase) ->
-        phrase = @normalize phrase
-        tokens = @tokenize phrase, true
-        if _.values(tokens).length > 1
-            @lookupAndRate tokens
-        else
-            []
-                
+        res = []
+        if phrase?
+            phrase = @normalize phrase
+            tokens = @tokenize phrase, true
+            if _.values(tokens).length > 1
+                res = @lookupAndRate tokens
+        res
+            
     lookupAndRate: (tokens) ->
         results = {}
         

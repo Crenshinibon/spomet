@@ -3,9 +3,12 @@ Spomet.FullWordIndex =
     collection: new Meteor.Collection('spomet-fullwordindex')
     
     find: (phrase) ->
-        phrase = @normalize phrase
-        tokens = @tokenize phrase
-        @lookupAndRate tokens
+        res = []
+        if phrase?
+            phrase = @normalize phrase
+            tokens = @tokenize phrase
+            res = @lookupAndRate tokens
+        res
         
     lookupAndRate: (tokens) ->
         results = {}

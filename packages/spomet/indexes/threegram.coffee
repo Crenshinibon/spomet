@@ -3,9 +3,12 @@ Spomet.ThreeGramIndex =
     collection: new Meteor.Collection('spomet-threegramindex')
     
     find: (phrase) ->
-        phrase = @normalize phrase
-        tokens = @tokenize phrase
-        @lookupAndRate tokens, phrase
+        res = []
+        if phrase?
+            phrase = @normalize phrase
+            tokens = @tokenize phrase
+            res = @lookupAndRate tokens, phrase
+        res
         
     lookupAndRate: (tokens, phrase) ->
         results = {}

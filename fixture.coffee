@@ -1,3 +1,5 @@
+@CustomContent = new Meteor.Collection('custom-content')
+
 @Posts = new Meteor.Collection('posts')
 
 if Meteor.isServer
@@ -59,8 +61,12 @@ if Meteor.isServer
     
     Meteor.publish 'posts', () ->
         Posts.find()
+        
+    Meteor.publish 'custom', () ->
+        CustomContent.find()
     
 if Meteor.isClient
     Meteor.subscribe 'posts'
+    Meteor.subscribe 'custom'
         
     
