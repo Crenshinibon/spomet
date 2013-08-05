@@ -5,9 +5,11 @@ Spomet is the contraction of Spotting Meteors.
 
 Test it [here](http://spomet.meteor.com/ "Spomet hosted at meteor.com")
 
-Spomet is a simple, but for my purpose (and eventually many other's) sufficient, search engine for [Meteor](http://meteor.com "Home of Meteor"). It should be easily includable into your Meteor project. Take the [spomet package](https://github.com/Crenshinibon/spomet/tree/master/packages/spomet "Spomet package") from this GitHub repository's packages folder and put it into your app's packages folder.
+It is a quite simple and limited fulltext search engine for [Meteor](http://meteor.com "Home of Meteor"). Besides it's simplicity it's sufficient for my purpose (and eventually for many other's). It should be easily included into your Meteor project. Take the [spomet package](https://github.com/Crenshinibon/spomet/tree/master/packages/spomet "Spomet package") from this GitHub repository's *packages* folder and put it into your app's *packages* folder.
 
-This Meteor app, should serve as an example how to actually use it. I tried to make this usage as simple as possible:
+This repository is itself a Meteor app and should serve as an example, of how to actually use Spomet. 
+
+I tried to make it as simple as possible:
 
 Include the search box in your template:
     
@@ -17,7 +19,7 @@ Access the results through the CurrentSearch collection:
 
     Spomet.CurrentSearch.find()
 
-The search is user based. As long as their is no logged-in user Spomet takes the user *anon*. Multiple anonymous users do **interfere** with each other. A future version might utilize the Session to separate anonymous users.
+The search is user based. As long as there is no logged-in user Spomet takes the user *anon*. Multiple anonymous users do **interfere** with each other. A future version might utilize the Session to separate anonymous users.
 
 Add documents to the search by calling the method *add* with a *Findable* instance:
 
@@ -26,7 +28,7 @@ Add documents to the search by calling the method *add* with a *Findable* instan
 * text
     The first parameter is the text, to be indexed.
 * path
-    Part of the identifier, relative to the bae. Useful to identify parts of the base document. E.g. attribute identifiers of the stored document.
+    Part of the identifier, relative to the base. Useful to identify parts of the base document. E.g. attribute identifiers of the stored document.
 * base
     The base path. E.g. the id of the document, whose text should be indexed.
 * rev
@@ -37,7 +39,7 @@ Add documents to the search by calling the method *add* with a *Findable* instan
 Technology
 ==========
 
-The current implementation uses three simple indexes. They are supposed to balance precision and recall. There haven't been many tests yet. So future updates might fine-tune the parameters and introduce further indexes. 
+The current implementation uses three simple indexes. They are supposed to balance precision and recall. There haven't been any tests yet. So future updates might fine-tune the parameters and introduce further indexes, drop some or make their use configurable. 
 
 Currently there is a 3gram based index, a simple word index and a wordgroup index. Whereas wordgroups are groups of two words.
 
@@ -47,7 +49,7 @@ Furthermore is the implementation not very efficient, I fear. There is plenty of
 
 A small client side subset of the most commonly used index terms to accelarate the search, for example.
 
-The server process handles the heavy lifting of indexing the documents. So when there are many documents to include the server will stall. A future enhancement might include establishing a separate process (deployable on a different host) for the indexing.
+The server process handles the heavy lifting of indexing the documents. So when there are many documents to include the server will stall. A future enhancement might include establishing a separate process (deployable on a different host) for the indexing. Client side indexing might not me doable, because of security considerations.
 
 Tests
 =====
@@ -63,7 +65,7 @@ Warning
 
 This package is in it's really really early stages. As it should allow for some basic usage, there are many aspects missing. The functionality to remove documents from the index, for example. Supporting information to highlight matching aspects of resulting documents is also missing. As well as the performance improvements mentioned above.
 
-There is of course no guarantee for it's correct functioning.
+There is of course no guarantee for it's correct functioning. And I'm not liable on any consequences resulting from the usage of this software.
 
 Plans
 =====
