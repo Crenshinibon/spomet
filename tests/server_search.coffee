@@ -14,7 +14,7 @@ suite 'Server Find', () ->
             Spomet.add e2
             Spomet.add e3
             
-            Spomet.find 'much more eas', 'user',
+            Spomet.find 'much more eas', 'user', 'sessionId',
                 wordGroupCallback: (results) ->
                     emit 'wgcallback', results
                 fullWordsCallback: (results) ->

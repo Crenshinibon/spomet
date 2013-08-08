@@ -2,11 +2,11 @@ Deps.autorun () ->
     Meteor.subscribe 'current-search-results'
     Meteor.subscribe 'latest-phrases'
 
-Spomet.find = (phrase) ->
-    Meteor.call 'spomet_find', phrase
+Spomet.find = (phrase, options) ->
+    Meteor.call 'spometFind', phrase, (Session.get 'sessionId'), options
     
 Spomet.add = (findable) ->
-    Meteor.call 'spomet_add', findable
+    Meteor.call 'spometAdd', findable
 
 Template.spometSearch.latestPhrase = () ->
     e = Spomet.LatestPhrases.findOne {}, {sort: [['queried', 'desc']], limit: 1}
@@ -14,6 +14,8 @@ Template.spometSearch.latestPhrase = () ->
         e.phrase
     else
         ''
+
+Spomet.options = Spomet.defaultOptions
 
 Template.spometSearch.rendered = () ->
     $('input.spomet-search-field').typeahead
@@ -25,7 +27,7 @@ Template.spometSearch.rendered = () ->
         updater: (item) ->
             obj = JSON.parse item
             $('input.spomet-search-field')[0].value = obj.phrase
-            Spomet.find obj.phrase
+            Spomet.find obj.phrase, Spomet.options
         matcher: (item) ->
             regexp = new RegExp(@query,'i')
             regexp.test item.phrase
@@ -42,7 +44,7 @@ Template.spometSearch.events
     'submit form': (e) ->
         e.preventDefault()
         phrase = $('input.spomet-search-field')[0].value
-        Spomet.find phrase
+        Spomet.find phrase, Spomet.options
     'focus input': (e) ->
         $('input.spomet-search-field').first().select()
     'mouseup input': (e) ->

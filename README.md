@@ -19,7 +19,7 @@ Access the results through the CurrentSearch collection:
 
     Spomet.CurrentSearch.find()
 
-The search is user based. As long as there is no logged-in user Spomet takes the user *anon*. Multiple anonymous users do **interfere** with each other. A future version might utilize the Session to separate anonymous users.
+The search results are stored user based, for logged in users. Otherwise the results will be saved by sessionId and dismissed after one hour.
 
 Add documents to the search by calling the method *add* with a *Findable* instance:
 

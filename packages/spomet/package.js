@@ -7,6 +7,9 @@ Package.on_use(function (api) {
    api.use(['templating'], 'client');
    
    api.add_files('namespace.coffee',['server','client']);
+   
+   api.add_files('provide_session_id.coffee',['server','client']);
+   
    api.add_files('shared.coffee',['server','client']);
    
    api.add_files('server_collections.coffee','server');

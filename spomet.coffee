@@ -1,4 +1,7 @@
 if Meteor.isClient
+    Spomet.options = 
+        combineOnBase: true
+    
     Template.addable.posts = () ->
         Posts.find({indexed: false},{limit: 3})
 
