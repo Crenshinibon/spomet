@@ -35,7 +35,6 @@ suite 'Anon Client Find', () ->
         client.once 'emptyAgain', (r) ->
             assert.equal 0, r.length
             done()
-            
         count = 0
         client.on 'result', (result) ->
             if count is 0

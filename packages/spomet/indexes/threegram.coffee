@@ -1,7 +1,37 @@
-Spomet.ThreeGramIndex =
+@ThreeGramIndex =
+    name: 'threegram'
     layerBoost: 0.8
     collection: new Meteor.Collection('spomet-threegramindex')
     
+    
+class @ThreeGramIndex.Indexer
+    tokens = {}
+    currentToken = []
+    
+    @parseCharacter: (c, pos) ->
+        v = validCharacter c
+        if v?
+            if pos >= 3
+                tokens[currentToken.join ''] = pos
+                currentToken = currentToken[1..]
+                currentToken.push v
+            else
+                currentToken.push v
+        
+        
+    @indexTokens: () ->
+        name: ThreeGramIndex.name
+        tokens: _.keys tokens
+    
+
+    validCharacter: (c) ->
+        v = c?.toLowerCase()
+        if v?.match /[a-z'\-äüö\s\d]/
+            v
+        else
+            null
+            
+###
     find: (phrase) ->
         res = []
         if phrase?
@@ -72,3 +102,5 @@ Spomet.ThreeGramIndex =
         normed = @normalize findable.text
         tokens = @tokenize normed
         Spomet.Index.add findable, normed, tokens, @collection, iCallback
+            
+###

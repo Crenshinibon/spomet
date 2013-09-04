@@ -1,7 +1,42 @@
-Spomet.FullWordIndex =
+@FullWordIndex =
+    name: 'fullword'
     layerBoost: 1.0
-    collection: new Meteor.Collection('spomet-fullwordindex')
+    collection: new Meteor.Collection('spomet-fullwordindex')        
+
+class @FullWordIndex.Tokenizer
+    @tokens = {}
+    @index = FullWordIndex
+    @collection = = FullWordIndex.collection
     
+    _tokenStarted = false
+    _currentToken = []
+    _currentTokenPos = 0
+
+    @parseCharacter: (c, pos) ->
+        v = validateCharacter c
+        if v?
+            unless _tokenStarted
+                _currentTokenPos = pos
+        
+            _tokenStarted = true
+            _currentToken.push v
+        else
+            if _tokenStarted
+                tokens[_currentToken.join ''] = _currentTokenPos
+            
+                _tokenStarted = false
+                _currentToken = []
+        
+    
+    validateCharacter: (c) ->
+        v = c?.toLowerCase()
+        if v?.match /[a-z'\-äüö\d]/
+            v
+        else
+            null
+
+
+###
     find: (phrase) ->
         res = []
         if phrase?
@@ -9,10 +44,10 @@ Spomet.FullWordIndex =
             tokens = @tokenize phrase
             res = @lookupAndRate tokens
         res
-        
+    
     lookupAndRate: (tokens) ->
         results = {}
-        
+    
         mostCommonTermCountQuery = Spomet.Index.mostCommonTermCount tokens
         meta = @collection.findOne {type: 'meta'}
         if meta?
@@ -21,42 +56,23 @@ Spomet.FullWordIndex =
                 if term?
                     documentsCountWithTerm = term.documents.length
                     term.documents.forEach (e) ->
-                        score = Spomet.Index.rate(
+                        score = Index.rate(
                             e.currentTermCount, 
                             e.documentLength, 
                             e.mostCommonTermCount, 
                             meta.documentsCount, 
                             documentsCountWithTerm) 
                         score = score * Spomet.FullWordIndex.layerBoost / _.values(tokens).length * value / mostCommonTermCountQuery
-                        
-                        docId = Spomet.documentId e.version, e.base, e.path            
+                    
                         unless results[docId]?
-                            results[docId] = new Spomet.Result e.version, e.base, e.path, score
+                            results[docId] = 
+                                version: e.version, 
+                                base: e.base, 
+                                path: e.path,
+                                type: e.type, 
+                                score: score
                         else
                             results[docId].score += score
         _.values results
+###
     
-    tokenize: (text) ->
-        tokens = {}
-        text.split(' ').forEach (e) ->
-            if tokens[e]?
-                tokens[e] += 1
-            else
-                tokens[e] = 1
-        tokens
-        
-    
-    normalize: (text) ->
-        text = text.toLowerCase().replace /[^a-z'\-äüö]/g, ' '
-        text = text.replace /\s{2,}/g, ' '
-        text.trim()
-         
-    add: (findable, callback) ->
-        iCallback = (message, error) ->
-            callback? "Document: #{findable.base}#{findable.path} added to word index."
-            
-        normed = @normalize findable.text
-        tokens = @tokenize normed
-        
-        Spomet.Index.add findable, normed, tokens, @collection, iCallback
-        

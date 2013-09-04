@@ -1,2 +1,2 @@
 if Meteor.isClient
-    Session.set 'sessionId', Meteor.default_connection._lastSessionId
+    Session.set 'sessionId', Meteor.connection._lastSessionId

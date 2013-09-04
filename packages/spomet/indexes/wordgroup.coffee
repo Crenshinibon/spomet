@@ -1,7 +1,46 @@
-Spomet.WordGroupIndex =
+@WordGroupIndex =
+    name: 'wordgroup'
     layerBoost: 2
     collection: new Meteor.Collection('spomet-wordgroupindex')
     
+    
+class @WordGroupIndex.Indexer
+    tokens = {}
+    currentToken = []
+    
+    nextWord = false
+    currentTokenPos = 0
+    spaceEntcountered = false
+    
+    @parseCharacter: (c, pos) ->
+        v = validCharacter c
+        if v?
+            unless v.match /\s/
+                if currentToken.length is 0 then currentTokenPos = pos
+                currentToken.push v
+                
+                if spaceEntcountered
+                    nextWord = true
+                    spaceEntcountered = false
+            else
+                if nextWord
+                    tokens[currentToken.join ''] = currentTokenPos
+                    currentToken = []
+                else
+                    spaceEncountered = true
+    
+    @indexTokens: () ->
+        name: WordGroupIndex.name
+        tokens: _.keys tokens
+        
+    validCharacter: (c) ->
+        v = c?.toLowerCase()
+        if v?.match /[a-z'\-äüö\s\d]/
+            v
+        else
+            null
+    
+    ###
     find: (phrase) ->
         res = []
         if phrase?
@@ -75,3 +114,4 @@ Spomet.WordGroupIndex =
             Spomet.Index.add findable, normed, tokens, @collection, iCallback
         else
             callback?("Document: #{findable.base}#{findable.path} NOT indexed. It contains only one word.")
+###
