@@ -3,32 +3,35 @@
     layerBoost: 1.0
     collection: new Meteor.Collection('spomet-fullwordindex')        
 
-class @FullWordIndex.Tokenizer
-    @tokens = {}
-    @index = FullWordIndex
-    @collection = = FullWordIndex.collection
-    
-    _tokenStarted = false
-    _currentToken = []
-    _currentTokenPos = 0
+#This is needed to make it possible to export WordGroupIndex during test
+FullWordIndex = @FullWordIndex
 
-    @parseCharacter: (c, pos) ->
-        v = validateCharacter c
+class @FullWordIndex.Tokenizer
+    tokens: {}
+    index: FullWordIndex
+    collection: FullWordIndex.collection
+    
+    _tokenStarted: false
+    _currentToken: []
+    _currentTokenPos: 0
+
+    parseCharacter: (c, pos) =>
+        v = @validateCharacter c
         if v?
-            unless _tokenStarted
-                _currentTokenPos = pos
+            unless @_tokenStarted
+                @_currentTokenPos = pos
         
-            _tokenStarted = true
-            _currentToken.push v
+            @_tokenStarted = true
+            @_currentToken.push v
         else
-            if _tokenStarted
-                tokens[_currentToken.join ''] = _currentTokenPos
+            if @_tokenStarted
+                @tokens[@_currentToken.join ''] = @_currentTokenPos
             
-                _tokenStarted = false
-                _currentToken = []
+                @_tokenStarted = false
+                @_currentToken = []
         
     
-    validateCharacter: (c) ->
+    validateCharacter: (c) =>
         v = c?.toLowerCase()
         if v?.match /[a-z'\-äüö\d]/
             v

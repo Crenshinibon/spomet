@@ -4,19 +4,20 @@ suite '3Gram', () ->
     test 'tokenize', (done, server) ->
         
         server.eval () ->
-            a = Spomet.ThreeGramIndex.tokenize 'das ist ein kleiner text'
-            emit 'tokens', a
-        
-        server.once 'tokens', (t) ->
-            assert.ok not t['  d']?
-            assert.equal t[' da'], 1
-            assert.equal t['das'], 1
-            assert.equal t['ein'], 2
-            assert.equal t['xt '], 1
-            assert.ok not t['t  ']?
-            assert.ok not t['']?
-            done()
+            #Spomet.options.indexes = [ThreeGramIndex]
+            Spomet.index
             
+            tokenizer = new ThreeGramIndex.Tokenizer
+            
+            'this is some text'.split('').forEach (c, i) ->
+                tokenizer.parseCharacter c, i
+            emit 'tokens', tokenizer.tokens
+            
+        server.once 'tokens', (t) ->
+            
+            console.log t
+            done()
+    ###        
     test 'normalize', (done, server) ->
         
         server.eval () ->
@@ -68,5 +69,5 @@ suite '3Gram', () ->
             assert.equal 3, r.length
             done()
             
-        
+    ###
             

@@ -7,8 +7,8 @@
     index: (findable, tokens, collection) ->
         for token, pos of tokens
             doc = 
-                docId = findable.docId
-                pos = pos
+                docId: findable.docId
+                pos: pos
             
             t = collection.find {token: token}
             if t?
@@ -36,3 +36,8 @@
         else
             callback? 'Document already added!'
             
+    reset: () ->
+        Documents.collection.remove {}
+        
+        Spomet.options.indexes.forEach (index) ->
+            index.collection.remove {}

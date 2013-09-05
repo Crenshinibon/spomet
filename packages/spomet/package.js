@@ -6,8 +6,6 @@ Package.on_use(function (api) {
    api.use('coffeescript',['client','server']);
    api.use('templating', 'client');
    
-   api.export('Spomet');
-   
    api.add_files('md5.js', ['server']);
    api.add_files('provide_session_id.coffee',['server','client']);
    
@@ -19,17 +17,13 @@ Package.on_use(function (api) {
    api.add_files('indexes/index.coffee','server');
    
    api.add_files('shared.coffee',['server','client']);
-   api.add_files('collections.coffee',['server','client']);
    
    api.add_files('server.coffee','server');
    
    api.add_files('search_field.html','client');
    api.add_files('client.coffee','client');
    
+   api.export('Spomet',['server','client']);
+   api.export('ThreeGramIndex','server',{testOnly: true})
+   
    });
-
-Package.on_test(function (api) {
-    api.export('ThreeGramIndex');
-    api.export('FullWordIndex');
-    api.export('WordGroupIndex');
-});

@@ -2,29 +2,28 @@
     name: 'threegram'
     layerBoost: 0.8
     collection: new Meteor.Collection('spomet-threegramindex')
-    
-    
-class @ThreeGramIndex.Indexer
-    tokens = {}
-    currentToken = []
-    
-    @parseCharacter: (c, pos) ->
-        v = validCharacter c
-        if v?
-            if pos >= 3
-                tokens[currentToken.join ''] = pos
-                currentToken = currentToken[1..]
-                currentToken.push v
-            else
-                currentToken.push v
-        
-        
-    @indexTokens: () ->
-        name: ThreeGramIndex.name
-        tokens: _.keys tokens
-    
 
-    validCharacter: (c) ->
+#This is needed to make it possible to export WordGroupIndex during test
+ThreeGramIndex = @ThreeGramIndex
+
+class @ThreeGramIndex.Tokenizer
+    
+    tokens: {}
+    index: ThreeGramIndex
+    collection: ThreeGramIndex.collection
+    
+    _currentToken: []
+    
+    parseCharacter: (c, pos) =>
+        v = @validCharacter c
+        if v?
+            @_currentToken.push v
+            if pos > 2
+                @tokens[@_currentToken.join ''] = pos
+                @_currentToken = @_currentToken[1..]
+                
+            
+    validCharacter: (c) =>
         v = c?.toLowerCase()
         if v?.match /[a-z'\-äüö\s\d]/
             v

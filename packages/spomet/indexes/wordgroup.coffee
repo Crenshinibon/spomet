@@ -3,37 +3,38 @@
     layerBoost: 2
     collection: new Meteor.Collection('spomet-wordgroupindex')
     
+#This is needed to make it possible to export WordGroupIndex during test
+WordGroupIndex = @WordGroupIndex
     
-class @WordGroupIndex.Indexer
-    tokens = {}
-    currentToken = []
+class @WordGroupIndex.Tokenizer
+    tokens: {}
+    index: WordGroupIndex
+    collectin: WordGroupIndex.collection
     
-    nextWord = false
-    currentTokenPos = 0
-    spaceEntcountered = false
+    _currentToken: []
     
-    @parseCharacter: (c, pos) ->
-        v = validCharacter c
+    _nextWord: false
+    _currentTokenPos: 0
+    _spaceEntcountered: false
+    
+    parseCharacter: (c, pos) =>
+        v = @validCharacter c
         if v?
             unless v.match /\s/
-                if currentToken.length is 0 then currentTokenPos = pos
-                currentToken.push v
+                if @_currentToken.length is 0 then @_currentTokenPos = pos
+                @_currentToken.push v
                 
-                if spaceEntcountered
-                    nextWord = true
-                    spaceEntcountered = false
+                if @_spaceEntcountered
+                    @_nextWord = true
+                    @_spaceEntcountered = false
             else
-                if nextWord
-                    tokens[currentToken.join ''] = currentTokenPos
-                    currentToken = []
+                if @_nextWord
+                    @tokens[@_currentToken.join ''] = @_currentTokenPos
+                    @_currentToken = []
                 else
-                    spaceEncountered = true
+                    @_spaceEncountered = true
     
-    @indexTokens: () ->
-        name: WordGroupIndex.name
-        tokens: _.keys tokens
-        
-    validCharacter: (c) ->
+    validCharacter: (c) =>
         v = c?.toLowerCase()
         if v?.match /[a-z'\-äüö\s\d]/
             v

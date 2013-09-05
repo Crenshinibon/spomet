@@ -48,8 +48,6 @@ Spomet.add = (findable, callback) ->
 Spomet.remove = (delEntity) ->
     
     
-    
-    
 Spomet.shrink = () ->
     
 Spomet.discardOutdated = () ->
@@ -58,10 +56,7 @@ Spomet.rebuilt = (validEntities) ->
     
 Spomet.reset = () ->
     cleanupSearches()
-    
-    Spomet.ThreeGramIndex.collection.remove {}
-    Spomet.FullWordIndex.collection.remove {}
-    Spomet.WordGroupIndex.collection.remove {}
+    Index.reset()
     
 Meteor.methods
     spometFind: (phrase) ->
