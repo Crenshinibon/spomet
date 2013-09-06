@@ -4,15 +4,11 @@
         existing = Spomet.Documents.find {docId: findable.docId}
         existing?
     
-    add: (findable, indexTokens) ->
+    add: (findable, tokens) ->
         #expects as indexTokens {index: name, tokens: ['t1','t2']}
         unless @exists findable
-            doc = 
+            @collection.insert 
                 docId: findable.docId
                 findable: findable
-        
-            for indexName, tokens of indexTokens
-                doc[index] = tokens
-        
-            @collection.insert doc
-        
+                indexTokens: tokens
+            

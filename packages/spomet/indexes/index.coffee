@@ -5,16 +5,16 @@
         tf * idf
     
     index: (findable, tokens, collection) ->
-        for token, pos of tokens
+        tokens.forEach (token) ->
             doc = 
                 docId: findable.docId
-                pos: pos
+                pos: token.pos
             
-            t = collection.find {token: token}
+            t = collection.find {token: token.token}
             if t?
-                collection.update {token: token}, {$push: {documents: doc}}
+                collection.update {token: token.token}, {$push: {documents: doc}}
             else
-                collection.insert {token: token, documents: [doc]}
+                collection.insert {token: token.token, documents: [doc]}
     
     add: (findable, callback) ->
         
@@ -29,9 +29,10 @@
                     t.parseCharacter c, pos
             
             tokenizer.forEach (t) ->
+                t.finalize()
                 index findable, t.tokens, t.collection
             
-            Documents.add findable, tokenizer.map (i) -> i.indexTokens()
+            Documents.add findable, tokenizer.map (i) -> i.tokens
             callback? 'Document added to all indexes'
         else
             callback? 'Document already added!'
@@ -41,3 +42,8 @@
         
         Spomet.options.indexes.forEach (index) ->
             index.collection.remove {}
+
+
+class @Index.Token
+    constructor: (@indexName, @token, @pos) ->
+    

@@ -7,37 +7,41 @@
 WordGroupIndex = @WordGroupIndex
     
 class @WordGroupIndex.Tokenizer
-    tokens: {}
     index: WordGroupIndex
-    collectin: WordGroupIndex.collection
+    collection: WordGroupIndex.collection
     
-    _currentToken: []
-    
-    _nextWord: false
-    _currentTokenPos: 0
-    _spaceEntcountered: false
+    constructor: () ->
+        @tokens = []
+        @_currentWord = []
+        @_prevWord = []
+        @_tokenStartPos = 0
     
     parseCharacter: (c, pos) =>
+        
         v = @validCharacter c
         if v?
-            unless v.match /\s/
-                if @_currentToken.length is 0 then @_currentTokenPos = pos
-                @_currentToken.push v
-                
-                if @_spaceEntcountered
-                    @_nextWord = true
-                    @_spaceEntcountered = false
+            #space encountered
+            if v.match /\s/
+                if @_prevWord.length is 0 and @_currentWord.length > 0
+                    @shift(pos)
+                else if @_prevWord.length > 0 and @_currentWord.length > 0
+                    @tokens.push new Index.Token @index.name, @_prevWord.concat(@_currentWord).join(''), @_tokenStartPos
+                    @shift(pos)
             else
-                if @_nextWord
-                    @tokens[@_currentToken.join ''] = @_currentTokenPos
-                    @_currentToken = []
-                else
-                    @_spaceEncountered = true
+                @_currentWord.push v
+                        
+    finalize: () =>
+        if @_prevWord.length isnt 0 and @_currentWord.length isnt 0
+            @tokens.push new Index.Token @index.name, @_prevWord.concat(@_currentWord).join(''), @_tokenStartPos
+        
+    shift: (pos) =>
+        @_tokenStartPos = pos - @_currentWord.length 
+        @_prevWord = @_currentWord[..]
+        @_currentWord = []
     
     validCharacter: (c) =>
-        v = c?.toLowerCase()
-        if v?.match /[a-z'\-äüö\s\d]/
-            v
+        if c?.match /[a-zA-Z'\-äüöÄÜÖ\s\d]/
+            c
         else
             null
     

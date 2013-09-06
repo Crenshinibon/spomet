@@ -10,7 +10,7 @@ Package.on_use(function (api) {
    api.add_files('provide_session_id.coffee',['server','client']);
    
    api.add_files('indexes/threegram.coffee','server');
-   api.add_files('indexes/fullwords.coffee','server');
+   api.add_files('indexes/fullword.coffee','server');
    api.add_files('indexes/wordgroup.coffee','server');
    
    api.add_files('indexes/documents.coffee','server')
@@ -24,6 +24,8 @@ Package.on_use(function (api) {
    api.add_files('client.coffee','client');
    
    api.export('Spomet',['server','client']);
-   api.export('ThreeGramIndex','server',{testOnly: true})
    
+   api.export('ThreeGramIndex','server',{testOnly: true})
+   api.export('FullWordIndex','server',{testOnly: true})
+   api.export('WordGroupIndex','server',{testOnly: true})
    });
