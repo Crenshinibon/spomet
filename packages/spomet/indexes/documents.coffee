@@ -1,7 +1,7 @@
 @Documents = 
     collection: new Meteor.Collection 'spomet-docs'
     exists: (findable) ->
-        existing = Spomet.Documents.find {docId: findable.docId}
+        existing = @collection.findOne {docId: findable.docId}
         existing?
     
     add: (findable, tokens) ->

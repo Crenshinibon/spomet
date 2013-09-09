@@ -28,33 +28,33 @@ suite 'WordGroup', () ->
             
         #edge cases
         server.eval () ->
-            tokenizer = new WordGroupIndex.Tokenizer
+            tokenizer = new Spomet.WordGroupIndex.Tokenizer
             #no text
             tokenizer.finalize()
             emit 'tokens2', tokenizer.tokens
             
-            tokenizer = new WordGroupIndex.Tokenizer
+            tokenizer = new Spomet.WordGroupIndex.Tokenizer
             #one word
             'oneword'.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i
             tokenizer.finalize()
             emit 'tokens3', tokenizer.tokens
             
-            tokenizer = new WordGroupIndex.Tokenizer
+            tokenizer = new Spomet.WordGroupIndex.Tokenizer
             #leading space
             ' two words'.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i
             tokenizer.finalize()
             emit 'tokens4', tokenizer.tokens
             
-            tokenizer = new WordGroupIndex.Tokenizer
+            tokenizer = new Spomet.WordGroupIndex.Tokenizer
             #trailing space
             'two words '.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i
             tokenizer.finalize()
             emit 'tokens5', tokenizer.tokens
             
-            tokenizer = new WordGroupIndex.Tokenizer
+            tokenizer = new Spomet.WordGroupIndex.Tokenizer
             #multiple spaces
             '  three   cool    words  '.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i

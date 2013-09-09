@@ -11,7 +11,7 @@ suite '3Gram', () ->
         
         
         server.eval () ->
-            tokenizer = new ThreeGramIndex.Tokenizer
+            tokenizer = new Spomet.ThreeGramIndex.Tokenizer
             
             'this is some text'.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i
@@ -42,31 +42,31 @@ suite '3Gram', () ->
             
         #edge cases
         server.eval () ->
-            tokenizer = new ThreeGramIndex.Tokenizer
+            tokenizer = new Spomet.ThreeGramIndex.Tokenizer
             #empty
             tokenizer.finalize()
             emit 'tokens1', tokenizer.tokens
             
-            tokenizer = new ThreeGramIndex.Tokenizer
+            tokenizer = new Spomet.ThreeGramIndex.Tokenizer
             #one letter
             tokenizer.parseCharacter 'c', 0
             tokenizer.finalize()
             emit 'tokens2', tokenizer.tokens
             
-            tokenizer = new ThreeGramIndex.Tokenizer
+            tokenizer = new Spomet.ThreeGramIndex.Tokenizer
             #two letters
             tokenizer.parseCharacter 'g', 0
             tokenizer.parseCharacter 'o', 1
             tokenizer.finalize()
             emit 'tokens3', tokenizer.tokens
             
-            tokenizer = new ThreeGramIndex.Tokenizer
+            tokenizer = new Spomet.ThreeGramIndex.Tokenizer
             #one space
             tokenizer.parseCharacter ' ', 0
             tokenizer.finalize()
             emit 'tokens4', tokenizer.tokens
             
-            tokenizer = new ThreeGramIndex.Tokenizer
+            tokenizer = new Spomet.ThreeGramIndex.Tokenizer
             #multiple spaces
             ' ab  die   post'.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i

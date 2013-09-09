@@ -16,6 +16,11 @@ class @ThreeGramIndex.Tokenizer
         @_latestPos = 0
         @tokens = []
     
+    tokenize: (text) ->
+        text.split('').forEach (c, i) ->
+            @parseCharacter c, i
+        @finalize()
+    
     parseCharacter: (c, pos) =>
         v = @validCharacter c
         if @_first
@@ -41,7 +46,20 @@ class @ThreeGramIndex.Tokenizer
             c
         else
             null
-            
+
+@ThreeGramIndex.find = (phrase) ->
+    found = {}
+    
+    tokenizer = new ThreeGramIndex.Tokenizer
+    tokenizer.tokenize phrase
+    
+    tokenizer.tokens.forEach (token) ->
+        @collection.find({token: token}).forEach (t) ->
+            if found[t.docId]
+                found[t.docId].push token
+            else
+                found[t.docId] = [token]
+    
 ###
     find: (phrase) ->
         res = []

@@ -8,7 +8,7 @@ suite 'FullWords', () ->
             assert.equal tokens[i].pos, pos
         
         server.eval () ->
-            tokenizer = new FullWordIndex.Tokenizer 
+            tokenizer = new Spomet.FullWordIndex.Tokenizer 
             
             'das ist ein kleiner text ein kleiner text'.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i
@@ -29,12 +29,12 @@ suite 'FullWords', () ->
         
         #edge cases
         server.eval () ->
-            tokenizer = new FullWordIndex.Tokenizer
+            tokenizer = new Spomet.FullWordIndex.Tokenizer
             #empty
             tokenizer.finalize()
             emit 'tokens1', tokenizer.tokens
             
-            tokenizer = new FullWordIndex.Tokenizer
+            tokenizer = new Spomet.FullWordIndex.Tokenizer
             #multiple spaces
             ' small  text    rules '.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i
