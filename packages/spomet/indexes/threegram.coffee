@@ -3,8 +3,8 @@
     layerBoost: 0.8
     collection: new Meteor.Collection('spomet-threegramindex')
 
-#This is needed to make it possible to export ThreeGramIndex during test
-ThreeGramIndex = @ThreeGramIndex
+if Meteor.isServer
+    Spomet.ThreeGramIndex = @ThreeGramIndex
 
 class @ThreeGramIndex.Tokenizer
     index: ThreeGramIndex

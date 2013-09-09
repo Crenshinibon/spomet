@@ -1,6 +1,7 @@
 assert = require 'assert'
 
 suite '3Gram', () ->
+    
     test 'tokenize', (done, server) ->
         
         assertToken = (tokens, i, indexName, token, pos) ->

@@ -1,7 +1,3 @@
-Spomet = {}
-
-Spomet.Search = new Meteor.Collection 'spomet-search'
-
 Spomet.defaultOptions =
     indexes: [WordGroupIndex, FullWordIndex, ThreeGramIndex]
     resultsCount: 20

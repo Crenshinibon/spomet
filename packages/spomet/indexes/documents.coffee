@@ -12,3 +12,4 @@
                 findable: findable
                 indexTokens: tokens
             
+Spomet.Documents = @Documents

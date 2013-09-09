@@ -1,6 +1,7 @@
 assert = require 'assert'
 
 suite 'WordGroup', () ->
+    
     test 'tokenize', (done, server) ->
         assertToken = (tokens, i, indexName, token, pos) ->
             assert.equal tokens[i].indexName, indexName
@@ -13,7 +14,7 @@ suite 'WordGroup', () ->
             'das ist ein kleiner text'.split('').forEach (c, i) ->
                 tokenizer.parseCharacter c, i
             tokenizer.finalize()
-                
+            
             emit 'tokens1', tokenizer.tokens
         
         server.once 'tokens1', (t) ->

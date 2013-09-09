@@ -12,9 +12,16 @@
             
             t = collection.find {token: token.token}
             if t?
-                collection.update {token: token.token}, {$push: {documents: doc}}
+                #maybe count only documents once, 
+                #currently duplicate tokens are counted twice
+                collection.update {token: token.token}, 
+                    $inc: {documentsCount: 1}, 
+                    $push: {documents: doc}
             else
-                collection.insert {token: token.token, documents: [doc]}
+                collection.insert 
+                    token: token.token, 
+                    documentsCount: 1, 
+                    documents: [doc]
     
     add: (findable, callback) ->
         
@@ -43,6 +50,8 @@
         Spomet.options.indexes.forEach (index) ->
             index.collection.remove {}
 
+if Meteor.isServer
+    Spomet.Index = @Index
 
 class @Index.Token
     constructor: (@indexName, @token, @pos) ->

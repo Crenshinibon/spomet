@@ -3,8 +3,8 @@
     layerBoost: 1.0
     collection: new Meteor.Collection('spomet-fullwordindex')        
 
-#This is needed to make it possible to export FullWordIndex during test
-FullWordIndex = @FullWordIndex
+if Meteor.isServer
+    Spomet.FullWordIndex = @FullWordIndex
 
 class @FullWordIndex.Tokenizer
     index: FullWordIndex

@@ -1,3 +1,5 @@
+Spomet.Search = new Meteor.Collection 'spomet-search'
+
 searchResultAddOrAppend = (result, phraseHash, seen, index) ->
     if seen[result.docId]?
         Spomet.Search.update {phraseHash: phraseHash, docId: result.docId}, {$inc: {score: result.score}}

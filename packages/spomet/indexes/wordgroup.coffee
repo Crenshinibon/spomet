@@ -3,8 +3,8 @@
     layerBoost: 2
     collection: new Meteor.Collection('spomet-wordgroupindex')
     
-#This is needed to make it possible to export WordGroupIndex during test
-WordGroupIndex = @WordGroupIndex
+if Meteor.isServer
+    Spomet.WordGroupIndex = @WordGroupIndex
     
 class @WordGroupIndex.Tokenizer
     index: WordGroupIndex
