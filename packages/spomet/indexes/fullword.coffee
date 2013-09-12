@@ -1,14 +1,16 @@
 @FullWordIndex =
     name: 'fullword'
-    layerBoost: 1.0
-    collection: new Meteor.Collection('spomet-fullwordindex')        
+    indexBoost: 1.0
+    collection: new Meteor.Collection('spomet-fullwordindex')
 
 if Meteor.isServer
     Spomet.FullWordIndex = @FullWordIndex
 
 class @FullWordIndex.Tokenizer
+    indexName: FullWordIndex.name
     index: FullWordIndex
     collection: FullWordIndex.collection
+    indexBoost: FullWordIndex.indexBoost
     
     constructor: () ->
         @_tokenStarted = false

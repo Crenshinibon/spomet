@@ -1,25 +1,22 @@
 @ThreeGramIndex =
     name: 'threegram'
-    layerBoost: 0.8
+    indexBoost: 0.3
     collection: new Meteor.Collection('spomet-threegramindex')
-
+    
 if Meteor.isServer
     Spomet.ThreeGramIndex = @ThreeGramIndex
 
 class @ThreeGramIndex.Tokenizer
+    indexName: ThreeGramIndex.name
     index: ThreeGramIndex
     collection: ThreeGramIndex.collection
+    indexBoost: ThreeGramIndex.indexBoost
     
     constructor: () ->
         @_currentToken = []
         @_first = true
         @_latestPos = 0
         @tokens = []
-    
-    tokenize: (text) ->
-        text.split('').forEach (c, i) ->
-            @parseCharacter c, i
-        @finalize()
     
     parseCharacter: (c, pos) =>
         v = @validCharacter c
@@ -47,18 +44,7 @@ class @ThreeGramIndex.Tokenizer
         else
             null
 
-@ThreeGramIndex.find = (phrase) ->
-    found = {}
-    
-    tokenizer = new ThreeGramIndex.Tokenizer
-    tokenizer.tokenize phrase
-    
-    tokenizer.tokens.forEach (token) ->
-        @collection.find({token: token}).forEach (t) ->
-            if found[t.docId]
-                found[t.docId].push token
-            else
-                found[t.docId] = [token]
+
     
 ###
     find: (phrase) ->

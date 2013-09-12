@@ -1,14 +1,16 @@
 @WordGroupIndex =
     name: 'wordgroup'
-    layerBoost: 2
+    indexBoost: 2
     collection: new Meteor.Collection('spomet-wordgroupindex')
     
 if Meteor.isServer
     Spomet.WordGroupIndex = @WordGroupIndex
     
 class @WordGroupIndex.Tokenizer
+    indexName: WordGroupIndex.name
     index: WordGroupIndex
     collection: WordGroupIndex.collection
+    indexBoost: WordGroupIndex.indexBoost
     
     constructor: () ->
         @tokens = []
