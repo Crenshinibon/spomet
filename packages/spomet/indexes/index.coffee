@@ -91,6 +91,13 @@ documentsCountWithToken = (collection, token) ->
                         found[d.docId] = [{token: t.token, pos: d.pos}]
         found
         
+    remove: (docId, indexName, remToken) ->
+        index = i for i in Spomet.options.indexes when i.name is indexName
+        index.collection.update {token: remToken},
+            $pull: {documents: {docId: docId}}
+            $inc: {documentsCount: -1}
+            
+    
     find: (phrase, callback, options) ->
         unless options?.indexes?
             unless options? then options = {}
