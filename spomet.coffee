@@ -1,12 +1,14 @@
 if Meteor.isClient
-    Spomet.options = 
-        combineOnBase: true
+    Session.set 'spomet-search-opts', 
+        combineOneBase: true
+        
+    Session.set 'random-offset', Math.random()
     
     Template.addable.posts = () ->
-        Posts.find({indexed: false},{limit: 3})
+        Posts.find({indexed: false, rand: {$gt: Session.get 'random-offset'}},{limit: 3})
 
     Template.search.results = () ->
-        Spomet.CurrentSearch.find()
+        Spomet.Search.find()
     
     Template.result.score = () ->
         @score.toFixed 4
@@ -29,15 +31,14 @@ if Meteor.isClient
         
     Template.addable.events
         'click input' : () ->
-            Spomet.add new Spomet.Findable this.title, '/title', this._id, 1
-            Spomet.add new Spomet.Findable this.text, '/text', this._id, 1
+            Session.set 'random-offset', Math.random()
+            Spomet.add new Spomet.Findable this.title, '/title', this._id, 'post', 1
+            Spomet.add new Spomet.Findable this.text, '/text', this._id, 'post', 1
             Posts.update {_id: this._id},{$set: {indexed: true}}
 
     Template.ownText.events
         'submit form': (e) ->
             text = $(e.target).find('textarea').first().val()
             id = CustomContent.insert {text: text}
-            Spomet.add new Spomet.Findable text, 'custom', id, 1
+            Spomet.add new Spomet.Findable text, 'custom', id, 'custom', 1
     
-if Meteor.isServer
-    Meteor.startup () ->

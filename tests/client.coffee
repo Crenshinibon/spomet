@@ -1,11 +1,9 @@
 assert = require 'assert'
 
-suite 'Anon Client Find', () ->
+suite 'Client Find', () ->
     test 'find something', (done, server, client) ->
         server.eval () ->
             Spomet.reset()
-            Spomet.anonymousResultTimeout = 20
-            Spomet.anonymousResultInterval = 10
             
             e1 = new Spomet.Findable 'this should be easily found', '/', 'OID1', 1
             e2 = new Spomet.Findable 'much more harder to find', '/', 'OID2', 1
@@ -16,16 +14,16 @@ suite 'Anon Client Find', () ->
             Spomet.add e3
             
         client.eval () ->
-            Spomet.CurrentSearch.find().observe
+            Spomet.Search.find().observe
                 added: (result) ->
                     emit 'result', result
                             
-            e = Spomet.CurrentSearch.find().fetch()
+            e = Spomet.Search.find().fetch()
             emit 'empty', e
             Spomet.find 'much more'
             
             checkEmpty = () ->
-                e = Spomet.CurrentSearch.find().fetch()
+                e = Spomet.Search.find().fetch()
                 emit 'emptyAgain', e
             Meteor.setTimeout checkEmpty, 50
         

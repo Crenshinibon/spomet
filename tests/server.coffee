@@ -94,8 +94,8 @@ suite 'Server Find', () ->
             Spomet.reset()
             
             e1 = new Spomet.Findable 'this should be easily found', '/', 'OID1', 'post', 1
-            e2 = new Spomet.Findable 'more harder to find', '/', 'OID2', 'post', 1
-            e3 = new Spomet.Findable 'much more much more harder to find', '/', 'OID3', 'post', 1
+            e2 = new Spomet.Findable 'harder to find', '/', 'OID2', 'post', 1
+            e3 = new Spomet.Findable 'much more harder to find', '/', 'OID3', 'post', 1
             
             Spomet.add e1
             Spomet.add e2
@@ -104,19 +104,26 @@ suite 'Server Find', () ->
             Spomet.Search.find().observe
                 added: (added) ->
                     emit 'added', added
-                changed: (newDocument, oldDocument) ->
-                    emit 'updated', newDocument
             
             ret = Spomet.find 'much more eas'
             emit 'returned', ret
             
+            results = Spomet.Search.find({},{sort: [['score','desc']]}).fetch()
+            emit 'found', results
+            
         server.on 'added', (added) ->
-            console.log added
-        
-        server.on 'updated', (upd) ->
-            console.log upd
-        
+            if added.docId?
+                assert.ok added.docId in ['post-OID1-/-1','post-OID3-/-1']
+                    
+                    
         server.once 'returned', (ret) ->
             assert.ok not ret.cached
+        
+        server.once 'found', (found) ->
+            assert.equal 2, found.length
+            assert.equal found[0].docId, 'post-OID3-/-1'
+            assert.equal found[0].hits.length, 12
+            assert.equal found[1].docId, 'post-OID1-/-1'
+            assert.equal found[1].hits.length, 3
             done()
         

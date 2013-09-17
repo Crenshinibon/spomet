@@ -1,14 +1,6 @@
 assert = require 'assert'
 
 suite 'Index', () ->
-    test 'tfidf', (done, server) ->
-        server.eval () ->
-            a = Spomet.Index.tfidf 2, 25, 4, 2, 1
-            emit 'rate', a
-        server.once 'rate', (a) ->
-            assert.equal 2 / Math.log(4 * 25) * Math.log(3 / 1), a
-            done()
-    
     test 'add', (done, server) ->
         server.eval () ->
             Spomet.reset()
@@ -41,40 +33,6 @@ suite 'Index', () ->
             
             iTokens = docs[0].indexTokens
             assert.equal iTokens.length, 21
-            done()
-    
-    test 'findWithIndex', (done, server) ->
-        server.eval () ->
-            Spomet.reset()
-            
-            doc1 = new Spomet.Findable 'can be found', '/', 'oid1', 'post', 1
-            Spomet.Index.add doc1
-            doc2 = new Spomet.Findable 'this not', '/', 'oid2', 'post', 1
-            Spomet.Index.add doc2
-            doc3 = new Spomet.Findable 'quite hard to find', '/', 'oid3', 'post', 1
-            Spomet.Index.add doc3
-            
-            
-            res = Spomet.Index.findWithIndex Spomet.ThreeGramIndex, 
-                'hard', 
-                (token, docId, pos) -> 
-                    emit 'found', token, docId, pos
-            emit 'all', res
-            
-        counter = 0
-        server.on 'found', (token, docId, pos) ->
-            counter += 1
-            assert.ok token in [' ha', 'har', 'ard', 'rd ']
-            assert.equal docId, 'post-oid3-/-1'
-            assert.ok pos in [6,7,8,9]
-            assert.ok counter < 5
-            
-        server.on 'all', (res) ->
-            docMatches = res['post-oid3-/-1']
-            assert.ok docMatches? 
-            docMatches.forEach (e) ->
-                assert.ok e.token in [' ha', 'har', 'ard', 'rd ']
-                assert.ok e.pos in [6,7,8,9]
             done()
     
     test 'find', (done, server) ->

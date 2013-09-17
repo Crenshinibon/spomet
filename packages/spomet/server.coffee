@@ -1,9 +1,7 @@
-Spomet.Search = new Meteor.Collection 'spomet-search'
-
 resultAddOrUpdate = (phraseHash, docId, hits, score) ->
     cur = Spomet.Search.findOne {phraseHash: phraseHash, docId: docId}
     if cur?
-        Spomet.Search.update {_id: cur._id}, {score: score, hits: hits}
+        Spomet.Search.update {_id: cur._id}, {$set: {score: score, hits: hits}}
     else
         doc = Spomet.Documents.collection.findOne {docId: docId}
         res = 
@@ -25,6 +23,7 @@ Spomet.find = (phrase) ->
         {phrase: phrase, hash: phraseHash, cached: true}
     else
         Spomet.Index.find phrase, (docId, hits, score) -> 
+            #console.log hits
             resultAddOrUpdate phraseHash, docId, hits, score
         {phrase: phrase, hash: phraseHash, cached: false}
         
@@ -65,15 +64,38 @@ Meteor.methods
         Spomet.find phrase
     spometAdd: (findable) ->
         Spomet.add findable
-
-
-Meteor.publish 'search-results', (phrase) ->
-    opts = {sort: [['score','desc']], limit: Spomet.options.resultsCount}
-    phraseHash = CryptoJS.MD5(phrase).toString()
-    Spomet.Search.find {phraseHash: phraseHash}, opts
-    
+        
 Meteor.publish 'common-terms', () ->
-    opts = {sort: [['docsCount','desc']], limit: Spomet.options.keywordsCount}
-    Spomet.FullWordIndex.collection.find {}, opts
+    Spomet.CommonTerms.find {},
+        sort: 
+            documentsCount: -1
+            tlength: -1
+        fields:
+            _id: 1
+            token: 1
+            documents: 1
+            documentsCount: 1
+            tlength: 1
+        limit: Spomet.options.keyWordsCount
+            
     
+Meteor.publish 'search-results', (phrase, options) ->
+    phraseHash = CryptoJS.MD5(phrase).toString()
+    selector = {phraseHash: phraseHash}
+    
+    opts = {}
+    unless options?.sort? 
+        opts.sort = {score: -1}
+        if options?.offset?
+            selector.score = {$lte: options.offset}
+    else
+        opts.sort[options.sort.sortBy] = options.sort.sortDirection
+        if options?.offset?
+            if options.sort.sortDirection is -1
+                selector[options.sort.sortBy] = {$lte: options.offset}
+            else if options.sort.sortDirection is 1
+                selector[options.sort.sortBy] = {$gte: options.offset}
+            
+    unless options?.limit? then opts.limit = Spomet.options.resultsCount
+    Spomet.Search.find selector, opts
     

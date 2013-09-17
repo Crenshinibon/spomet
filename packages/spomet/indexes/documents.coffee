@@ -29,7 +29,7 @@ calcMostCommonTermCount = (tokens) ->
             @collection.insert 
                 docId: findable.docId
                 findable: findable
-                length: findable.text.length
+                dlength: findable.text.length
                 indexTokens: tokens
                 mostCommonTermCount: calcMostCommonTermCount tokens
             cMeta = @collection.findOne({meta: 'count'})
@@ -41,12 +41,12 @@ calcMostCommonTermCount = (tokens) ->
     ratingParams: (docId) ->
         doc = @collection.findOne({docId: docId})
         if doc?
-            length: doc.length
+            dlength: doc.dlength
             mostCommonTermCount: doc.mostCommonTermCount
             documentsCount: @count()
         
     length: (docId) ->
-        @collection.findOne({docId: docId})?.length
+        @collection.findOne({docId: docId})?.dlength
         
     mostCommonTermCount: (docId) ->
         @collection.findOne({docId: docId})?.mostCommonTermCount

@@ -3,21 +3,19 @@ Package.describe({
 });
 
 Package.on_use(function (api) {
+   api.use('standard-app-packages', ['client', 'server']);
    api.use('coffeescript',['client','server']);
-   api.use('templating', 'client');
    
    api.add_files('md5.js', ['server']);
    
-   api.add_files('namespace.coffee',['client','server']);
-   
+   api.add_files('shared.coffee',['server','client']);
+  
    api.add_files('indexes/threegram.coffee','server');
-   api.add_files('indexes/fullword.coffee','server');
+   api.add_files('indexes/fullword.coffee',['server','client']);
    api.add_files('indexes/wordgroup.coffee','server');
    
    api.add_files('indexes/documents.coffee','server')
    api.add_files('indexes/index.coffee','server');
-   
-   api.add_files('shared.coffee',['server','client']);
    
    api.add_files('server.coffee','server');
    

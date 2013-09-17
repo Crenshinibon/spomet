@@ -1,9 +1,13 @@
-Spomet.defaultOptions =
-    indexes: [Spomet.WordGroupIndex, Spomet.FullWordIndex, Spomet.ThreeGramIndex]
+Spomet = {}
+
+Spomet.Search = new Meteor.Collection 'spomet-search'
+Spomet.CommonTerms = new Meteor.Collection 'spomet-fullword'
+
+Spomet.options =
+    indexes: []
     resultsCount: 20
     keywordsCount: 1000
-
-Spomet.options = Spomet.defaultOptions
+    combineOnBase: false
 
 class Spomet.Findable
     version: 1
@@ -11,3 +15,5 @@ class Spomet.Findable
     constructor: (@text, @path, @base, @type, @version) ->
         @docId = type + '-' + base + '-' + path + '-' + version
 
+
+@Index = {}
