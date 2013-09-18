@@ -30,6 +30,7 @@ calcMostCommonTermCount = (tokens) ->
                 docId: findable.docId
                 findable: findable
                 dlength: findable.text.length
+                created: new Date()
                 indexTokens: tokens
                 mostCommonTermCount: calcMostCommonTermCount tokens
             cMeta = @collection.findOne({meta: 'count'})

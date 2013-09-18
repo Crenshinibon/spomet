@@ -6,8 +6,6 @@ index = (findable, tokens, collection) ->
         
         t = collection.findOne {token: token.token}
         if t?
-            #maybe count only documents once, 
-            #currently duplicate tokens are counted twice
             upd = {$push: {documents: doc}}
             unless doc.docId in (t.documents.map (d) -> d.docId)
                 upd['$inc'] = {documentsCount: 1} 
@@ -50,7 +48,7 @@ findWithTokenizer = (tokenizer, callback) ->
 rate = (docId, tokenCounts) ->
     score = 0
     para = Documents.ratingParams docId
-    for key, data of tokenCounts
+    (_.values tokenCounts).forEach (data) ->
         score += data.indexBoost * tfidf data.tokenCountInDoc, 
             para.dlength, 
             para.mostCommonTermCount, 
@@ -87,8 +85,12 @@ Index.reset = () ->
         index.collection.remove {}
         index.collection._ensureIndex {token: 1}
             
-        
-        
+Index.setup = () ->
+    Documents.collection._ensureIndex {docId: 1}
+    Spomet.options.indexes.forEach (index) ->
+        index.collection._ensureIndex {token: 1}
+    
+    
 Index.remove = (docId, indexName, remToken) ->
     index = i for i in Spomet.options.indexes when i.name is indexName
     index.collection.update {token: remToken},
@@ -135,10 +137,8 @@ Index.find = (phrase, callback, options) ->
                 
             found[docId].score = rate docId, tCounts[docId]
             callback? docId, found[docId].tokens, found[docId].score
-    
-    for docId, data of found
-        docId: docId
-        hits: data.tokens
-        score: data.score
 
 Spomet.Index = @Index
+
+Meteor.startup = () ->
+    Index.setup()

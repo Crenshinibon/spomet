@@ -8,6 +8,9 @@ Spomet.options =
     resultsCount: 20
     keywordsCount: 1000
 
+Spomet.phraseHash = (phrase) ->
+    CryptoJS.MD5(phrase).toString()
+
 class Spomet.Findable
     version: 1
     type: 'default'

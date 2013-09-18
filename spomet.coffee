@@ -35,7 +35,11 @@ if Meteor.isClient
 
     Template.ownText.events
         'submit form': (e) ->
-            text = $(e.target).find('textarea').first().val()
+            e.preventDefault()
+            tarea = $(e.target).find('textarea').first()
+            text = tarea.val()
             id = CustomContent.insert {text: text}
             Spomet.add new Spomet.Findable text, 'custom', id, 'custom', 1
-    
+            tarea.val ''
+
+

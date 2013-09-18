@@ -1,30 +1,32 @@
-resultAddOrUpdate = (phraseHash, docId, hits, score) ->
-    cur = Spomet.Search.findOne {phraseHash: phraseHash, docId: docId}
-    if cur?
-        Spomet.Search.update {_id: cur._id}, {$set: {score: score, hits: hits}}
-    else
+createSearchDoc = (phraseHash, docId) ->
+    if Spomet.Search.find({phraseHash: phraseHash, docId: docId}).count() is 0
         doc = Spomet.Documents.collection.findOne {docId: docId}
         res = 
             phraseHash: phraseHash
             docId: docId
-            score: score
+            score: 0
             type: doc.findable.type
             base: doc.findable.base
             path: doc.findable.path
             version: doc.findable.version
-            hits: hits
+            hits: []
             queried: new Date()
+            interim: false
         Spomet.Search.insert res
+
+updateSearchDoc = (phraseHash, docId, hits, score) ->
+    cur = Spomet.Search.findOne {phraseHash: phraseHash, docId: docId}
+    Spomet.Search.update {_id: cur._id}, {$set: {score: score, hits: hits, interim: false}}
     
 Spomet.find = (phrase) ->
-    phraseHash = CryptoJS.MD5(phrase).toString()
-    cur = Spomet.Search.find {phraseHash: phraseHash}
+    phraseHash = Spomet.phraseHash(phrase)
+    cur = Spomet.Search.find {phraseHash: phraseHash, interim: false}
     unless cur.count() is 0
         {phrase: phrase, hash: phraseHash, cached: true}
     else
         Spomet.Index.find phrase, (docId, hits, score) -> 
-            #console.log hits
-            resultAddOrUpdate phraseHash, docId, hits, score
+            createSearchDoc phraseHash, docId
+            updateSearchDoc phraseHash, docId, hits, score
         {phrase: phrase, hash: phraseHash, cached: false}
         
 cleanupSearches = () ->
@@ -65,8 +67,20 @@ Meteor.methods
     spometAdd: (findable) ->
         Spomet.add findable
         
+Meteor.publish 'documents', () ->
+    Spomet.Documents.collection.find {},
+        fields:
+            _id: 1
+            docId: 1
+            'findable.type': 1
+            'findable.base': 1
+            'findable.path': 1
+            'findable.version': 1
+
+#should be extended
+stopWords = ['there','this','that','them','then','and','the','any','all','other','und','ich','wir','sie','als']
 Meteor.publish 'common-terms', () ->
-    Spomet.CommonTerms.find {},
+    Spomet.CommonTerms.find {tlength: {$gt: 2}, token: {$nin: stopWords}},
         sort: 
             documentsCount: -1
             tlength: -1
@@ -85,15 +99,15 @@ Meteor.publish 'search-results', (phrase, options) ->
     
     opts = {}
     unless options?.sort? 
-        opts.sort = {score: -1}
+        opts.sort = [['score', 'desc']]
         if options?.offset?
             selector.score = {$lte: options.offset}
     else
-        opts.sort[options.sort.sortBy] = options.sort.sortDirection
+        opts.sort = [[options.sort.sortBy, options.sort.sortDirection]]
         if options?.offset?
-            if options.sort.sortDirection is -1
+            if options.sort.sortDirection is 'desc'
                 selector[options.sort.sortBy] = {$lte: options.offset}
-            else if options.sort.sortDirection is 1
+            else if options.sort.sortDirection is 'asc'
                 selector[options.sort.sortBy] = {$gte: options.offset}
             
     unless options?.limit? then opts.limit = Spomet.options.resultsCount
