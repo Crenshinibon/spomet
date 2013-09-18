@@ -7,7 +7,6 @@ Spomet.options =
     indexes: []
     resultsCount: 20
     keywordsCount: 1000
-    combineOnBase: false
 
 class Spomet.Findable
     version: 1

@@ -26,7 +26,6 @@ suite 'pubsub', () ->
                     emit 'result', e
         times = 0    
         client.on 'result', (e) ->
-            console.log e
             times += 1
             if times is 1
                 assert.equal e.test, 'fest'

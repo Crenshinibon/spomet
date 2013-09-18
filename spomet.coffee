@@ -1,7 +1,4 @@
 if Meteor.isClient
-    Session.set 'spomet-search-opts', 
-        combineOneBase: true
-        
     Session.set 'random-offset', Math.random()
     
     Template.addable.posts = () ->

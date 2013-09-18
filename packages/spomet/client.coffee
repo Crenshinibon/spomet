@@ -17,6 +17,9 @@ Spomet.add = (findable) ->
 Template.spometSearch.latestPhrase = () ->
     Session.get 'spomet-current-search'
 
+Template.spometSearch.searching = () ->
+    Session.get('spomet-current-search')?
+
 typeaheadSource = (query) ->
     [start..., last] = @query.split ' '
     r = new RegExp "^#{last}"
@@ -25,18 +28,9 @@ typeaheadSource = (query) ->
         tlength: {$gt: last.length}
         
     fixed = start.join ' '
-    m = cursor.map (e) ->
+    cursor.map (e) ->
         fixed + ' ' + e.token
-    console.log m
-    m
 
-###
-highlighter: (item) ->
-    q = @query
-    parts = item.token.split q
-    parts.reduce (s, e) ->
-        s + '<span style="color: lightgrey">' + q + '</span>' + e
-###
 Template.spometSearch.rendered = () ->
     $('input.spomet-search-field').typeahead
         source: typeaheadSource
@@ -52,5 +46,7 @@ Template.spometSearch.events
         Spomet.find phrase
     'focus input.spomet-search-field': (e) ->
         $(e.target).select()
+    'click button.spomet-reset-search': (e) ->
+        Spomet.clearSearch()
     'mouseup input.spomet-search-field': (e) ->
         e.preventDefault()
