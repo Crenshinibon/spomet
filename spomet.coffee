@@ -2,7 +2,7 @@ if Meteor.isClient
     Session.set 'random-offset', Math.random()
     
     Template.addable.posts = () ->
-        Posts.find({indexed: false, rand: {$gt: Session.get 'random-offset'}},{limit: 3})
+        Posts.find {indexed: false}, {limit: 3}
 
     Template.search.results = () ->
         Spomet.Results()
