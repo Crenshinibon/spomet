@@ -6,6 +6,13 @@
 Spomet.CustomIndex = @CustomIndex
 Spomet.options.indexes.push @CustomIndex
 
+Meteor.methods
+    disableCustomIndex: () ->
+        i = Spomet.options.indexes.indexOf CustomIndex
+        if i isnt -1 then Spomet.options.indexes.splice i, 1
+    enableCustomIndex: () ->
+        Spomet.options.indexes.push CustomIndex
+
 class @CustomIndex.Tokenizer
     indexName: CustomIndex.name
     index: CustomIndex

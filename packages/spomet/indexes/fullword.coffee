@@ -6,6 +6,13 @@
 Spomet.FullWordIndex = @FullWordIndex
 Spomet.options.indexes.push @FullWordIndex
 
+Meteor.methods
+    disableFullWordIndex: () ->
+        i = Spomet.options.indexes.indexOf FullWordIndex
+        if i isnt -1 then Spomet.options.indexes.splice i, 1
+    enableFullWordIndex: () ->
+        Spomet.options.indexes.push FullWordIndex
+
 class @FullWordIndex.Tokenizer
     indexName: FullWordIndex.name
     index: FullWordIndex

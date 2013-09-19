@@ -5,7 +5,14 @@
     
 Spomet.WordGroupIndex = @WordGroupIndex
 Spomet.options.indexes.push @WordGroupIndex
-    
+
+Meteor.methods
+    disableWordGroupIndex: () ->
+        i = Spomet.options.indexes.indexOf WordGroupIndex
+        if i isnt -1 then Spomet.options.indexes.splice i, 1
+    enableWordGroupIndex: () ->
+        Spomet.options.indexes.push WordGroupIndex
+        
 class @WordGroupIndex.Tokenizer
     indexName: WordGroupIndex.name
     index: WordGroupIndex

@@ -6,6 +6,13 @@
 Spomet.ThreeGramIndex = @ThreeGramIndex
 Spomet.options.indexes.push @ThreeGramIndex
 
+Meteor.methods
+    disableThreeGramIndex: () ->
+        i = Spomet.options.indexes.indexOf ThreeGramIndex
+        if i isnt -1 then Spomet.options.indexes.splice i, 1
+    enableThreeGramIndex: () ->
+        Spomet.options.indexes.push ThreeGramIndex
+
 class @ThreeGramIndex.Tokenizer
     indexName: ThreeGramIndex.name
     index: ThreeGramIndex
