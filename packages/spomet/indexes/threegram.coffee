@@ -47,8 +47,9 @@ class @ThreeGramIndex.Tokenizer
             
     
     validCharacter: (c) =>
-        if c?.match /[a-zA-Z'\-äüöÄÜÖ\s\d]/
-            c
+        v = c.toLowerCase()
+        if v?.match /[a-z'\-äüö\s\d]/
+            v
         else
             null
 

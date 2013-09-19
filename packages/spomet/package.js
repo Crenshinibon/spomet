@@ -14,6 +14,7 @@ Package.on_use(function (api) {
    api.add_files('shared.coffee',['server','client']);
   
    api.add_files('indexes/threegram.coffee','server');
+   api.add_files('indexes/custom.coffee','server');
    api.add_files('indexes/fullword.coffee',['server','client']);
    api.add_files('indexes/wordgroup.coffee','server');
    

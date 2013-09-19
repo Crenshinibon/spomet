@@ -123,8 +123,9 @@ Template.spometSearch.events
         e.preventDefault()
         Spomet.clearSearch()
         phrase = $('input.spomet-search-field')[0].value
-        Spomet.find phrase
-        Session.set 'spomet-current-search', phrase
+        if phrase? and phrase.length > 0
+            Spomet.find phrase
+            Session.set 'spomet-current-search', phrase
     'click button.spomet-reset-search': (e) ->
         Spomet.clearSearch()
     'mouseup input.spomet-search-field': (e) ->
