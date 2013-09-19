@@ -1,5 +1,4 @@
 if Meteor.isClient
-    Session.set 'random-offset', Math.random()
     
     Template.addable.posts = () ->
         Posts.find {indexed: false}, {limit: 3}
@@ -28,7 +27,6 @@ if Meteor.isClient
         
     Template.addable.events
         'click input' : () ->
-            Session.set 'random-offset', Math.random()
             Spomet.add new Spomet.Findable this.title, '/title', this._id, 'post', 1
             Spomet.add new Spomet.Findable this.text, '/text', this._id, 'post', 1
             Posts.update {_id: this._id},{$set: {indexed: true}}
