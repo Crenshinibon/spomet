@@ -30,6 +30,11 @@ Spomet.find = (phrase) ->
         {phrase: phrase, hash: phraseHash, cached: false}
         
 cleanupSearches = () ->
+    #
+    # it might become necessary to keep searches a little bit longer
+    # removing searches and executing searches might interfere with
+    # each other, which might result in poor user experience
+    #
     Spomet.Search.remove {}
     Spomet.Search._ensureIndex {phraseHash: 1}
     Spomet.Search._ensureIndex {phraseHash: 1, docId: 1}
