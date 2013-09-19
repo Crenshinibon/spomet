@@ -15,9 +15,11 @@ Include the search box in your template:
     
     {{> spometSearch}}
     
-Access the results through the CurrentSearch collection:
+Access the results through a call to:
 
     Spomet.Results()
+
+It returns a Meteor Collections Cursor.
 
 Add documents to the search by calling the method *add* with a *Findable* instance:
 
