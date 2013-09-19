@@ -1,0 +1,4 @@
+.search-in-progress {
+    background: url("/packages/spomet/img/ajax-loader.gif") no-repeat right center;
+    border-right: 10px solid transparent;
+}

@@ -8,6 +8,9 @@ Package.on_use(function (api) {
    
    api.add_files('md5.js', ['client','server']);
    
+   api.add_files('img/ajax-loader.gif','client');
+   api.add_files('img/styles.css','client');
+   
    api.add_files('shared.coffee',['server','client']);
   
    api.add_files('indexes/threegram.coffee','server');

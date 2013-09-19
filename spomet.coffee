@@ -5,7 +5,7 @@ if Meteor.isClient
         Posts.find({indexed: false, rand: {$gt: Session.get 'random-offset'}},{limit: 3})
 
     Template.search.results = () ->
-        Spomet.Search.find()
+        Spomet.Results()
     
     Template.result.score = () ->
         @score.toFixed 4

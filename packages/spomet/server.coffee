@@ -66,7 +66,7 @@ Meteor.methods
         Spomet.find phrase
     spometAdd: (findable) ->
         Spomet.add findable
-        
+
 Meteor.publish 'documents', () ->
     Spomet.Documents.collection.find {},
         fields:
@@ -90,26 +90,10 @@ Meteor.publish 'common-terms', () ->
             documents: 1
             documentsCount: 1
             tlength: 1
-        limit: Spomet.options.keyWordsCount
+        limit: Spomet.options.keywordsCount
             
     
-Meteor.publish 'search-results', (phrase, options) ->
-    phraseHash = CryptoJS.MD5(phrase).toString()
-    selector = {phraseHash: phraseHash}
-    
-    opts = {}
-    unless options?.sort? 
-        opts.sort = [['score', 'desc']]
-        if options?.offset?
-            selector.score = {$lte: options.offset}
-    else
-        opts.sort = [[options.sort.sortBy, options.sort.sortDirection]]
-        if options?.offset?
-            if options.sort.sortDirection is 'desc'
-                selector[options.sort.sortBy] = {$lte: options.offset}
-            else if options.sort.sortDirection is 'asc'
-                selector[options.sort.sortBy] = {$gte: options.offset}
-            
-    unless options?.limit? then opts.limit = Spomet.options.resultsCount
-    Spomet.Search.find selector, opts
-    
+Meteor.publish 'search-results', (phrase, sort, offset, limit) ->
+    if phrase?
+        [selector, opts] = Spomet.buildSearchQuery phrase, sort, offset, limit
+        Spomet.Search.find selector, opts
