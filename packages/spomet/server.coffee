@@ -71,6 +71,12 @@ Meteor.methods
         Spomet.find phrase
     spometAdd: (findable) ->
         Spomet.add findable
+    spometRemove: (findable) ->
+        Spomet.remove findable.docId
+    spometUpdate: (findale) ->
+        prevDocId = findable.previousVersionDocId()
+        Spomet.remove prevDocId
+        Spomet.add findable
 
 Meteor.publish 'documents', () ->
     Spomet.Documents.collection.find {},

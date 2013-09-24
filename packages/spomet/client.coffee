@@ -34,6 +34,14 @@ Spomet.clearSearch = () ->
 Spomet.add = (findable) ->
     Meteor.call 'spometAdd', findable, () ->
     Spomet.clearSearch()
+    
+Spomet.update = (findable) ->
+    Meteor.call 'spometUpdate', findable, () ->
+    Spomet.clearSearch()
+        
+Spomet.remove = (findable) ->
+    Meteor.call 'spometRemove', findable, () ->
+    Spomet.clearSearch()
 
 Spomet.setSort = (sort) ->
     Session.set 'spomet-search-sort', sort

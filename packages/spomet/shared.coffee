@@ -35,10 +35,11 @@ Spomet.buildSearchQuery = (phrase, sort, offset, limit) ->
     [selector, opts]
 
 class Spomet.Findable
-    version: 1
-    type: 'default'
     constructor: (@text, @path, @base, @type, @version) ->
-        @docId = type + '-' + base + '-' + path + '-' + version
-
+        unless version? then @version = 1
+        unless type? then @type = 'default'
+        @docId = @type + '-' + base + '-' + path + '-' + @version
+    previousVersionDocId: () ->
+        @type + '-' + @base + '-' + @path + '-' + (@version - 1)
 
 @Index = {}
