@@ -5,7 +5,6 @@ Template.spometSearch.latestPhrase = () ->
     if phrase? then phrase else ''
 
 Template.spometSearch.searchInProgress = () ->
-    console.log Spomet.defaultSearch.isSearching()
     Spomet.defaultSearch.isSearching()?
 
 Template.spometSearch.searching = () ->
