@@ -9,21 +9,24 @@ It is a quite simple and limited fulltext search engine for [Meteor](http://mete
 
 This repository is itself a Meteor app and should serve as an example, of how to actually use Spomet. 
 
-I tried to make it as simple as possible:
+Get Started
+===========
+
+I tried to make using the package as simple as possible:
 
 Include the search box in your template:
     
     {{> spometSearch}}
     
-Access the results through a call to:
+Access the results, found by using the search box, through a call to:
 
-    Spomet.Results()
+    Spomet.defaultSearch.results()
 
 It returns a Meteor Collections Cursor.
 
-Add documents to the search by calling the method *add* with a *Findable* instance:
+Add documents to the search by calling the method *add* with a *Spomet.Findable* instance:
 
-    Spomet.add new Spomet.Findable text, path, base, rev
+    Spomet.add new Spomet.Findable text, path, base, type, rev
 
 * text
     The first parameter is the text, to be indexed.
@@ -35,6 +38,27 @@ Add documents to the search by calling the method *add* with a *Findable* instan
     The documents type. Might be useful to distinguish between different types of documents. 
 * rev
     A revision number to support multiple version of a document.
+    
+
+Advanced
+========
+
+You can delete documents from the search by calling *Spomet.remove* with a *Spomet.Findable* instance as the parameter or with the *docId*.
+
+    Spomet.remove 'post-id1234-description-2'
+    Spomet.remove new Spomet.Findable null, 'description', 'id1234', 'post', 2
+
+You can update already indexed documents, dismissing the prior version.
+
+    Spomet.update new Spomet.Findable text, path, base, type, rev
+    
+The document, with *rev - 1* gets removed from the search as a result.
+
+You can create your own searches by instantiating *Spomet.Search*.
+
+    mySearch = new Spomet.Search
+    mySearch.find 'some text'
+    mySearch.results()
 
 
 Technology
@@ -48,7 +72,20 @@ Future enhancements might include stemming, algorithm based (e.g. Porter) or bas
 
 Furthermore is the implementation not very efficient, I fear. There is plenty of room to optimize certain aspects.
 
-The server process handles the heavy lifting of indexing the documents. So when there are many documents to include the server will stall. A future enhancement might include establishing a separate process (deployable on a different host) for the indexing. Client side indexing might not be doable, because of security considerations.
+The server process handles the heavy lifting of indexing, finding and scoring the documents. 
+
+When there are many documents to index the server might stall. 
+
+A future enhancement might include establishing a separate process (deployable on a different host) for the indexing. Client side indexing might not be doable, because of security considerations.
+
+If you experience performance issues you might want to disable certain Indexes, you should start with the 3Gram index.
+
+There are handy Meteor methods to achieve this:
+
+    Meteor.call 'disableThreeGramIndex'
+    Meteor.call 'disableCustomIndex'
+    Meteor.call 'disableWordGroupIndex'
+    Meteor.call 'disableFullWordIndex'
 
 Tests
 =====
@@ -64,7 +101,7 @@ Note: There might be some false errors, indicating some curly braces problem, wh
 Warning
 =======
 
-This package is in it's really really early stages. As it should allow for some basic usage, there might be some essential things missing.
+This package is still in it's really really early stages. As it should allow for some basic usage, there might be some essential things missing or going wrong.
 
 There is of course no guarantee for it's correct functioning. And I'm not liable on any consequences resulting from the usage of this software.
 

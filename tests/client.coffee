@@ -14,16 +14,16 @@ suite 'Client Find', () ->
             Spomet.add e3
             
         client.eval () ->
-            Spomet.Search.find().observe
+            Spomet.Searches.find().observe
                 added: (result) ->
                     emit 'result', result
                             
-            e = Spomet.Search.find().fetch()
+            e = Spomet.Searches.find().fetch()
             emit 'empty', e
-            Spomet.find 'much more'
+            Spomet.defaultSearch.find 'much more'
             
             checkEmpty = () ->
-                e = Spomet.Search.find().fetch()
+                e = Spomet.Searches.find().fetch()
                 emit 'emptyAgain', e
             Meteor.setTimeout checkEmpty, 50
         

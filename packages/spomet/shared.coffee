@@ -1,6 +1,6 @@
 Spomet = {}
 
-Spomet.Search = new Meteor.Collection 'spomet-search'
+Spomet.Searches = new Meteor.Collection 'spomet-search'
 Spomet.CommonTerms = new Meteor.Collection 'spomet-fullword'
 
 Spomet.options =

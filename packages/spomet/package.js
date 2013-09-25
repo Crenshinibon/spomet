@@ -23,8 +23,9 @@ Package.on_use(function (api) {
    
    api.add_files('server.coffee','server');
    
-   api.add_files('search_field.html','client');
    api.add_files('client.coffee','client');
+   api.add_files('search_field.html','client');
+   api.add_files('search_field.coffee','client');
    
    api.export('Spomet',['server','client']);
 });

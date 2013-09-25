@@ -4,7 +4,7 @@ if Meteor.isClient
         Posts.find {indexed: false}, {limit: 3}
 
     Template.search.results = () ->
-        Spomet.Results()
+        Spomet.defaultSearch.results()
     
     Template.result.score = () ->
         @score.toFixed 4

@@ -1,5 +1,5 @@
 createSearchDoc = (phraseHash, docId) ->
-    if Spomet.Search.find({phraseHash: phraseHash, docId: docId}).count() is 0
+    if Spomet.Searches.find({phraseHash: phraseHash, docId: docId}).count() is 0
         doc = Spomet.Documents.collection.findOne {docId: docId}
         res = 
             phraseHash: phraseHash
@@ -12,15 +12,15 @@ createSearchDoc = (phraseHash, docId) ->
             hits: []
             queried: new Date()
             interim: false
-        Spomet.Search.insert res
+        Spomet.Searches.insert res
 
 updateSearchDoc = (phraseHash, docId, hits, score) ->
-    cur = Spomet.Search.findOne {phraseHash: phraseHash, docId: docId}
-    Spomet.Search.update {_id: cur._id}, {$set: {score: score, hits: hits, interim: false}}
+    cur = Spomet.Searches.findOne {phraseHash: phraseHash, docId: docId}
+    Spomet.Searches.update {_id: cur._id}, {$set: {score: score, hits: hits, interim: false}}
     
 Spomet.find = (phrase) ->
     phraseHash = Spomet.phraseHash(phrase)
-    cur = Spomet.Search.find {phraseHash: phraseHash, interim: false}
+    cur = Spomet.Searches.find {phraseHash: phraseHash, interim: false}
     unless cur.count() is 0
         {phrase: phrase, hash: phraseHash, cached: true}
     else
@@ -35,9 +35,9 @@ cleanupSearches = () ->
     # removing searches and executing searches might interfere with
     # each other, which might result in poor user experience
     #
-    Spomet.Search.remove {}
-    Spomet.Search._ensureIndex {phraseHash: 1}
-    Spomet.Search._ensureIndex {phraseHash: 1, docId: 1}
+    Spomet.Searches.remove {}
+    Spomet.Searches._ensureIndex {phraseHash: 1}
+    Spomet.Searches._ensureIndex {phraseHash: 1, docId: 1}
 
 Spomet.add = (findable, callback) ->
     cleanupSearches()
@@ -72,7 +72,10 @@ Meteor.methods
     spometAdd: (findable) ->
         Spomet.add findable
     spometRemove: (findable) ->
-        Spomet.remove findable.docId
+        if findable?.docId?
+            Spomet.remove findable.docId
+        else if findable?
+            Spomet.remove findable
     spometUpdate: (findale) ->
         prevDocId = findable.previousVersionDocId()
         Spomet.remove prevDocId
@@ -107,4 +110,4 @@ Meteor.publish 'common-terms', () ->
 Meteor.publish 'search-results', (phrase, sort, offset, limit) ->
     if phrase?
         [selector, opts] = Spomet.buildSearchQuery phrase, sort, offset, limit
-        Spomet.Search.find selector, opts
+        Spomet.Searches.find selector, opts

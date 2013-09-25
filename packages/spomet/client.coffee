@@ -1,140 +1,133 @@
 Deps.autorun () ->
     Meteor.subscribe 'documents'
     Meteor.subscribe 'common-terms'
-    Meteor.subscribe 'search-results', 
-        Session.get 'spomet-current-search', 
-        Session.get 'spomet-search-sort',
-        Session.get 'spomet-search-offset',
-        Session.get 'spomet-search-limit'
-    
-Spomet.find = (phrase) ->
-    #
-    # THIS IS A HACK, I have to wait shortly, otherwise
-    # the intermediary results are not shown and Meteor
-    # waits for the end before displaying results.
-    # 
-    # The problem might be some optimization that's going
-    # on under the hood.
-    #
-    Session.set 'spomet-searching', true
-    find = () ->
-        if phrase? and phrase.length > 0
-            Meteor.call 'spometFind', phrase, () ->
-                Session.set 'spomet-searching', null
-    Meteor.setTimeout find, 5
-    
-Spomet.searching = () ->
-    Session.get 'spomet-searching'
-    
-Spomet.clearSearch = () ->
-    Session.set 'spomet-searching', null
-    Session.set 'spomet-current-search', null
-    Session.set 'spomet-search-offset', null
-    
+
 Spomet.add = (findable) ->
     Meteor.call 'spometAdd', findable, () ->
-    Spomet.clearSearch()
     
 Spomet.update = (findable) ->
     Meteor.call 'spometUpdate', findable, () ->
-    Spomet.clearSearch()
-        
+    
 Spomet.remove = (findable) ->
     Meteor.call 'spometRemove', findable, () ->
-    Spomet.clearSearch()
 
-Spomet.setSort = (sort) ->
-    Session.set 'spomet-search-sort', sort
-
-Spomet.getSort = () ->
-    Session.get 'spomet-search-sort'
-
-Spomet.setOffset = (offset) ->
-    Session.set 'spomet-search-offset', offset
+class Spomet.Search
     
-Spomet.getOffset = () ->
-    Session.get 'spomet-search-offset'
+    constructor: () ->
+        @collection = new Meteor.Collection null
+        @subHandle = null
     
-Spomet.setLimit = (limit) ->
-    Session.set 'spomet-search-limit', limit
-    
-Spomet.getLimit = () ->
-    Session.get 'spomet-search-limit'
-
-Spomet.Results = () ->
-    phrase = Session.get 'spomet-current-search'
-    if phrase?
-        [selector, opts] = Spomet.buildSearchQuery phrase, 
-            Spomet.getSort(), 
-            Spomet.getOffset(), 
-            Spomet.getLimit()
+    set: (key, value) =>
+        upd = {}
+        upd[key] = value
         
-        Spomet.Search.find selector, opts
-
-Template.spometSearch.latestPhrase = () ->
-    phrase = Session.get 'spomet-current-search'
-    if phrase? then phrase else ''
-
-Template.spometSearch.searchInProgress = () ->
-    Session.get('spomet-searching')?
-
-Template.spometSearch.searching = () ->
-    Session.get('spomet-current-search')?
-
-createIntermediaryResults = (item) ->
-    words = item.split(' ')
-    cur = Spomet.CommonTerms.find {token: {$in: words}} 
-    cur.forEach (e) ->
-        e.documents.forEach (d) ->
-            doc = Spomet.Documents.collection.findOne {docId: d.docId}
-            res = 
-                phraseHash: Spomet.phraseHash item
-                docId: d.docId
-                score: 0
-                type: doc.findable.type
-                base: doc.findable.base
-                path: doc.findable.path
-                version: doc.findable.version
-                hits: []
-                queried: new Date()
-                interim: true
-            Spomet.Search.insert res
-
-typeaheadSource = (query) ->
-    [start..., last] = @query.split ' '
-    r = new RegExp "^#{last}"
-    cursor = Spomet.CommonTerms.find 
-        token: r
-        tlength: {$gt: last.length}
-        
-    fixed = start.join ' '
-    cursor.map (e) ->
-        if fixed and fixed.length > 0
-            fixed + ' ' + e.token
+        sel = {}
+        sel[key] = {$exists: true}
+        existing = @collection.findOne sel
+        if existing?
+            @collection.update {_id: existing._id}, upd
         else
-            e.token
-
-Template.spometSearch.rendered = () ->
-    $('input.spomet-search-field').typeahead
-        source: typeaheadSource
-        updater: (item) ->
-            Spomet.clearSearch()
-            $('input.spomet-search-field')[0].value = item
-            createIntermediaryResults item
-            Spomet.find item
-            Session.set 'spomet-current-search', item
-        matcher: (item) ->
-            true
+            @collection.insert upd
+              
+    get: (key) =>
+        sel = {}
+        sel[key] = {$exists: true}
+        existing = @collection.findOne sel
+        if existing?
+            existing[key]
+        else
+            null
     
-Template.spometSearch.events
-    'submit form': (e) ->
-        e.preventDefault()
-        Spomet.clearSearch()
-        phrase = $('input.spomet-search-field')[0].value
+    reSubscribe: () =>
+        if @subHandle
+            @subHandle.stop()
+        search = @
+        
+        Deps.autorun () ->
+            search.subHandle = Meteor.subscribe 'search-results', 
+                search.get 'current-phrase', 
+                search.get 'search-sort',
+                search.get 'search-offset',
+                search.get 'search-limit'
+    
+    setCurrentPhrase: (phrase) =>
+        @set 'current-phrase', phrase
+        @reSubscribe()
+        
+    getCurrentPhrase: () =>
+        @get 'current-phrase'
+    
+    setSort: (sort) =>
+        @set 'search-sort', sort
+        @reSubscribe()
+        
+    getSort: () =>
+        @get 'search-sort'
+    
+    setOffset: (offset) =>
+        @set 'search-offset', offset
+        @reSubscribe()
+        
+    getOffset: () =>
+        @get 'search-offset'
+        
+    setLimit: (limit) =>
+        @set 'search-limit', limit
+        @reSubscribe()
+        
+    getLimit: () =>
+        @get 'search-limit'
+        
+    setSearching: (searching) =>
+        @set 'searching', searching
+    
+    isSearching: () =>
+        @get 'searching'
+    
+    
+    find: (phrase) =>
         if phrase? and phrase.length > 0
-            Spomet.find phrase
-            Session.set 'spomet-current-search', phrase
-    'click button.spomet-reset-search': (e) ->
-        Spomet.clearSearch()
-    'mouseup input.spomet-search-field': (e) ->
-        e.preventDefault()
+            @clearSearch phrase
+            @createIntermediaryResults phrase
+            
+            search = @
+            Meteor.call 'spometFind', phrase, () ->
+                search.setSearching null
+            
+    
+    clearSearch: (newPhrase) ->
+        @set 'searching', if newPhrase then true else null
+        @set 'current-phrase', newPhrase
+        @set 'search-offset', null
+        @set 'search-limit', null
+        @reSubscribe()
+    
+    createIntermediaryResults: (phrase) ->
+        words = phrase.split ' '
+        cur = Spomet.CommonTerms.find {token: {$in: words}} 
+        cur.forEach (e) ->
+            e.documents.forEach (d) ->
+                doc = Spomet.Documents.collection.findOne {docId: d.docId}
+                res = 
+                    phraseHash: Spomet.phraseHash phrase
+                    docId: d.docId
+                    score: 0
+                    type: doc.findable.type
+                    base: doc.findable.base
+                    path: doc.findable.path
+                    version: doc.findable.version
+                    hits: []
+                    queried: new Date()
+                    interim: true
+                Spomet.Searches.insert res
+
+    results: () ->
+        phrase = @getCurrentPhrase()
+        if phrase?
+            [selector, opts] = Spomet.buildSearchQuery phrase, 
+                @getSort(), 
+                @getOffset(), 
+                @getLimit()
+                
+            Spomet.Searches.find selector, opts
+

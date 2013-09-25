@@ -12,6 +12,7 @@ suite 'Index', () ->
                 emit 'threegram', Spomet.ThreeGramIndex.collection.find().fetch()
                 emit 'fullword', Spomet.FullWordIndex.collection.find().fetch()
                 emit 'wordgroup', Spomet.WordGroupIndex.collection.find().fetch()
+                emit 'custom', Spomet.CustomIndex.collection.find().fetch()
                 emit 'docs', Spomet.Documents.collection.find({meta: {$exists: false}}).fetch()
                 
         server.once 'added', (docId) ->
@@ -25,6 +26,9 @@ suite 'Index', () ->
             
         server.once 'wordgroup', (index) ->
             assert.equal index.length, 2
+        
+        server.once 'custom', (index) ->
+            assert.equal index.length, 4
             
         server.once 'docs', (docs) ->
             assert.equal 1, docs.length
@@ -32,7 +36,7 @@ suite 'Index', () ->
             assert.equal docs[0].findable.text, 'some simple text'
             
             iTokens = docs[0].indexTokens
-            assert.equal iTokens.length, 21
+            assert.equal iTokens.length, 25
             done()
     
     test 'find', (done, server) ->
@@ -47,30 +51,15 @@ suite 'Index', () ->
             Spomet.Index.add doc3
             
             
-            res = Spomet.Index.find 'hard', (docId, hits, score) ->
+            Spomet.Index.find 'hard', (docId, hits, score) ->
                 emit 'every', docId, hits, score
-            emit 'all1', res
             
-            res = Spomet.Index.find 'can be hard'
-            emit 'all2', res
             
         prevScore = 0
         server.on 'every', (docId, hits, score) ->
-            assert.ok hits.length < 6
+            assert.ok hits.length < 7
             assert.ok score > prevScore
             assert.equal docId, 'post-oid3-/-1'
             prevScore = score
-            
-        server.once 'all1', (res) ->
-            assert.equal res.length, 1
-            assert.equal res[0].docId, 'post-oid3-/-1'
-            tokens = res[0].hits.map (h) -> h.token
-            assert.ok tokens.every (t) -> t in ['hard', ' ha', 'har', 'ard', 'rd ']
-            
-        server.once 'all2', (res) ->
-            assert.equal res.length, 2
-            res.sort (a, b) -> b.score - a.score
-            assert.equal res[0].docId, 'post-oid1-/-1'
-            assert.equal res[1].docId, 'post-oid3-/-1'
             done()
             
