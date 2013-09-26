@@ -27,10 +27,13 @@ updateSearchDoc = (current, phraseHash, doc, hits, score) ->
         docId: doc.docId
         path: doc.findable.path
         hits: hits
+        score: score
+        
+    scoreSum = _.values(subDocs).reduce ((s, e) -> s + e.score), 0
     
     Spomet.Searches.update {_id: current._id}, 
         $set: 
-            score: score
+            score: scoreSum
             subDocs: subDocs
             interim: false
     
