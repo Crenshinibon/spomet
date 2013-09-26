@@ -23,7 +23,8 @@ createSearchDoc = (phraseHash, doc) ->
 updateSearchDoc = (current, phraseHash, doc, hits, score) ->
     subDocs = current.subDocs
     
-    subDocs[doc.docId] =
+    subDocs[doc.findable.path] =
+        docId: doc.docId
         path: doc.findable.path
         hits: hits
     

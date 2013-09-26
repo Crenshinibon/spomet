@@ -101,29 +101,20 @@ suite 'Server Find', () ->
             Spomet.add e2
             Spomet.add e3
             
-            Spomet.Searches.find().observe
-                added: (added) ->
-                    emit 'added', added
-            
             ret = Spomet.find 'much more eas'
             emit 'returned', ret
             
             results = Spomet.Searches.find({},{sort: [['score','desc']]}).fetch()
             emit 'found', results
             
-        server.on 'added', (added) ->
-            if added.docId?
-                assert.ok added.docId in ['post-OID1-/-1','post-OID3-/-1']
-                    
-                    
         server.once 'returned', (ret) ->
             assert.ok not ret.cached
         
         server.once 'found', (found) ->
             assert.equal 2, found.length
-            assert.ok found[0].subDocs['post-OID3-/-1']?
-            assert.equal found[0].subDocs['post-OID3-/-1'].hits.length, 14
-            assert.ok found[1].subDocs['post-OID1-/-1']?
-            assert.equal found[1].subDocs['post-OID1-/-1'].hits.length, 4
+            assert.ok found[0].subDocs['/']?
+            assert.equal found[0].subDocs['/'].hits.length, 14
+            assert.ok found[1].subDocs['/']?
+            assert.equal found[1].subDocs['/'].hits.length, 4
             done()
         
