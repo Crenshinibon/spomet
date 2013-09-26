@@ -41,6 +41,7 @@ Spomet.find = (phrase) ->
     phraseHash = Spomet.phraseHash phrase
     cur = Spomet.Searches.find {phraseHash: phraseHash, interim: false}
     unless cur.count() is 0
+        Spomet.Searches.remove {phraseHash: phraseHash, interim: true}
         {phrase: phrase, hash: phraseHash, cached: true}
     else
         docs = {}
