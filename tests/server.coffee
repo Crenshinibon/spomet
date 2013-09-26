@@ -121,9 +121,9 @@ suite 'Server Find', () ->
         
         server.once 'found', (found) ->
             assert.equal 2, found.length
-            assert.equal found[0].docId, 'post-OID3-/-1'
-            assert.equal found[0].hits.length, 14
-            assert.equal found[1].docId, 'post-OID1-/-1'
-            assert.equal found[1].hits.length, 4
+            assert.ok found[0].subDocs['post-OID3-/-1']?
+            assert.equal found[0].subDocs['post-OID3-/-1'].hits.length, 14
+            assert.ok found[1].subDocs['post-OID1-/-1']?
+            assert.equal found[1].subDocs['post-OID1-/-1'].hits.length, 4
             done()
         

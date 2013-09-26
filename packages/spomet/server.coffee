@@ -1,32 +1,51 @@
-createSearchDoc = (phraseHash, docId) ->
-    if Spomet.Searches.find({phraseHash: phraseHash, docId: docId}).count() is 0
-        doc = Spomet.Documents.collection.findOne {docId: docId}
+createSearchDoc = (phraseHash, doc) ->
+    current = Spomet.Searches.findOne
+        phraseHash: phraseHash
+        base: doc.findable.base
+        type: doc.findable.type
+        version: doc.findable.version
+    
+    if current?
+        current
+    else
         res = 
             phraseHash: phraseHash
-            docId: docId
             score: 0
             type: doc.findable.type
             base: doc.findable.base
-            path: doc.findable.path
             version: doc.findable.version
-            hits: []
+            subDocs: {}
             queried: new Date()
             interim: false
-        Spomet.Searches.insert res
+        id = Spomet.Searches.insert res
+        Spomet.Searches.findOne {_id: id}
 
-updateSearchDoc = (phraseHash, docId, hits, score) ->
-    cur = Spomet.Searches.findOne {phraseHash: phraseHash, docId: docId}
-    Spomet.Searches.update {_id: cur._id}, {$set: {score: score, hits: hits, interim: false}}
+updateSearchDoc = (current, phraseHash, doc, hits, score) ->
+    subDocs = current.subDocs
+    
+    subDocs[doc.docId] =
+        path: doc.findable.path
+        hits: hits
+    
+    Spomet.Searches.update {_id: current._id}, 
+        $set: 
+            score: score
+            subDocs: subDocs
+            interim: false
     
 Spomet.find = (phrase) ->
-    phraseHash = Spomet.phraseHash(phrase)
+    phraseHash = Spomet.phraseHash phrase
     cur = Spomet.Searches.find {phraseHash: phraseHash, interim: false}
     unless cur.count() is 0
         {phrase: phrase, hash: phraseHash, cached: true}
     else
-        Spomet.Index.find phrase, (docId, hits, score) -> 
-            createSearchDoc phraseHash, docId
-            updateSearchDoc phraseHash, docId, hits, score
+        docs = {}
+        Spomet.Index.find phrase, (docId, hits, score) ->
+            unless docs[docId]?
+                docs[docId] = Spomet.Documents.collection.findOne {docId: docId}
+            
+            current = createSearchDoc phraseHash, docs[docId]
+            updateSearchDoc current, phraseHash, docs[docId], hits, score
         {phrase: phrase, hash: phraseHash, cached: false}
         
 cleanupSearches = () ->
@@ -37,8 +56,8 @@ cleanupSearches = () ->
     #
     Spomet.Searches.remove {}
     Spomet.Searches._ensureIndex {phraseHash: 1}
-    Spomet.Searches._ensureIndex {phraseHash: 1, docId: 1}
-
+    Spomet.Searches._ensureIndex {phraseHash: 1, base: 1, type: 1, version: 1}
+    
 Spomet.add = (findable, callback) ->
     cleanupSearches()
     Spomet.Index.add findable, callback

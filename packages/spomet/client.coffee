@@ -95,14 +95,14 @@ class Spomet.Search
                 search.setSearching null
             
     
-    clearSearch: (newPhrase) ->
+    clearSearch: (newPhrase) =>
         @set 'searching', if newPhrase then true else null
         @set 'current-phrase', newPhrase
         @set 'search-offset', null
         @set 'search-limit', null
         @reSubscribe()
     
-    createIntermediaryResults: (phrase) ->
+    createIntermediaryResults: (phrase) =>
         words = phrase.split ' '
         cur = Spomet.CommonTerms.find {token: {$in: words}} 
         cur.forEach (e) ->
@@ -110,18 +110,16 @@ class Spomet.Search
                 doc = Spomet.Documents.collection.findOne {docId: d.docId}
                 res = 
                     phraseHash: Spomet.phraseHash phrase
-                    docId: d.docId
                     score: 0
                     type: doc.findable.type
                     base: doc.findable.base
-                    path: doc.findable.path
                     version: doc.findable.version
-                    hits: []
+                    subDocs: {}
                     queried: new Date()
                     interim: true
                 Spomet.Searches.insert res
 
-    results: () ->
+    results: () =>
         phrase = @getCurrentPhrase()
         if phrase?
             [selector, opts] = Spomet.buildSearchQuery phrase, 
