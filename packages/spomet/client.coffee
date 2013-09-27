@@ -41,14 +41,15 @@ class Spomet.Search
     reSubscribe: () =>
         if @subHandle
             @subHandle.stop()
-        search = @
         
+        search = @
         Deps.autorun () ->
-            search.subHandle = Meteor.subscribe 'search-results', 
-                search.get 'current-phrase', 
-                search.get 'search-sort',
-                search.get 'search-offset',
-                search.get 'search-limit'
+            opts = 
+                phrase: search.get 'current-phrase'
+                sort: search.get 'search-sort'
+                offset: search.get 'search-offset'
+                limit: search.get 'search-limit'
+            search.subHandle = Meteor.subscribe 'search-results', opts
     
     setCurrentPhrase: (phrase) =>
         @set 'current-phrase', phrase
@@ -58,6 +59,11 @@ class Spomet.Search
         @get 'current-phrase'
     
     setSort: (sort) =>
+        #be tolerant and allow {field: -1}
+        unless sort?.field? and sort?.direction?
+            sort.field = _.keys(sort)[0]
+            sort.direction = sort[sort.field]
+        
         @set 'search-sort', sort
         @reSubscribe()
         
