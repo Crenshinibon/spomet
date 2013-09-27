@@ -98,12 +98,11 @@ Index.remove = (docId, indexName, remToken) ->
         $inc: {documentsCount: -1}
             
     
-Index.find = (phrase, callback, options) ->
-    unless options?.indexes?
-        unless options? then options = {}
-        options.indexes = Spomet.options.indexes
+Index.find = (phrase, callback, indexes) ->
+    unless indexes?
+        indexes = Spomet.options.indexes
         
-    tokenizers = options.indexes.map (index) -> new index.Tokenizer
+    tokenizers = indexes.map (index) -> new index.Tokenizer
     phrase.split('').forEach (c, i) ->
         tokenizers.forEach (t) ->
             t.parseCharacter c, i

@@ -49,6 +49,7 @@ class Spomet.Search
                 sort: search.get 'search-sort'
                 offset: search.get 'search-offset'
                 limit: search.get 'search-limit'
+                excludes: search.get 'excludes'
             search.subHandle = Meteor.subscribe 'search-results', opts
     
     setCurrentPhrase: (phrase) =>
@@ -90,6 +91,17 @@ class Spomet.Search
     isSearching: () =>
         @get 'searching'
     
+    getIndexNames: () =>
+        @get 'index-names'
+        
+    setIndexNames: (indexNames) =>
+        @set 'index-names', indexNames
+        
+    getExcludes: () =>
+        @get 'excludes'
+        
+    setExcludes: (excludes) =>
+        @set 'excludes', excludes
     
     find: (phrase) =>
         if phrase? and phrase.length > 0
@@ -97,7 +109,7 @@ class Spomet.Search
             @createIntermediaryResults phrase
             
             search = @
-            Meteor.call 'spometFind', phrase, () ->
+            Meteor.call 'spometFind', phrase, @getIndexNames(), () ->
                 search.setSearching null
             
     
@@ -142,10 +154,12 @@ class Spomet.Search
     results: () =>
         phrase = @getCurrentPhrase()
         if phrase?
-            [selector, opts] = Spomet.buildSearchQuery phrase, 
-                @getSort(), 
-                @getOffset(), 
-                @getLimit()
-                
-            Spomet.Searches.find selector, opts
+            opts =
+                phrase: phrase
+                sort: @getSort()
+                offset: @getOffset()
+                limit: @getLimit()
+                excludes: @getExcludes()
+            [selector, qOpts] = Spomet.buildSearchQuery opts
+            Spomet.Searches.find selector, qOpts
 

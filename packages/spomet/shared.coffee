@@ -14,25 +14,31 @@ Spomet.options =
 Spomet.phraseHash = (phrase) ->
     CryptoJS.MD5(phrase).toString()
 
-Spomet.buildSearchQuery = (phrase, sort, offset, limit) ->
-    phraseHash = CryptoJS.MD5(phrase).toString()
+Spomet.buildSearchQuery = (options) ->
+    phraseHash = CryptoJS.MD5(options.phrase).toString()
     selector = {phraseHash: phraseHash}
     
-    unless sort?
-        sort = Spomet.options.sort
+    if options.excludes?
+        selector[base] = {$nin: options.excludes}
     
-    opts = {}
-    opts.sort = {}
-    opts.sort[sort.field] = sort.direction
+    unless options.sort?
+        options.sort = Spomet.options.sort
     
-    if offset?
-        if sort.direction is -1
-            selector[sort.field] = {$lte: offset}
-        else if sort.direction is 1
-            selector[sort.field] = {$gte: offset}
+    qOpts = {}
+    qOpts.sort = {}
+    qOpts.sort[options.sort.field] = options.sort.direction
     
-    unless limit? then opts.limit = Spomet.options.resultsCount
-    [selector, opts]
+    if options.offset?
+        if options.sort.direction is -1
+            selector[options.sort.field] = {$lte: options.offset}
+        else if options.sort.direction is 1
+            selector[options.sort.field] = {$gte: options.offset}
+    
+    if options.limit? 
+        qOpts.limit = options.limit
+    else
+        qOpts.limit = Spomet.options.resultsCount
+    [selector, qOpts]
 
 class Spomet.Findable
     constructor: (@text, @path, @base, @type, @version) ->

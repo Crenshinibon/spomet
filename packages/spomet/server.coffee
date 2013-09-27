@@ -37,7 +37,7 @@ updateSearchDoc = (current, phraseHash, doc, hits, score) ->
             subDocs: subDocs
             interim: false
     
-Spomet.find = (phrase) ->
+Spomet.find = (phrase, options) ->
     phraseHash = Spomet.phraseHash phrase
     cur = Spomet.Searches.find {phraseHash: phraseHash, interim: false}
     unless cur.count() is 0
@@ -45,12 +45,14 @@ Spomet.find = (phrase) ->
         {phrase: phrase, hash: phraseHash, cached: true}
     else
         docs = {}
-        Spomet.Index.find phrase, (docId, hits, score) ->
+        findCallback = (docId, hits, score) ->
             unless docs[docId]?
                 docs[docId] = Spomet.Documents.collection.findOne {docId: docId}
             
             current = createSearchDoc phraseHash, docs[docId]
             updateSearchDoc current, phraseHash, docs[docId], hits, score
+            
+        Spomet.Index.find phrase, findCallback, options
         {phrase: phrase, hash: phraseHash, cached: false}
         
 cleanupSearches = () ->
@@ -91,8 +93,13 @@ Spomet.reset = () ->
     Index.reset()
     
 Meteor.methods
-    spometFind: (phrase) ->
-        Spomet.find phrase
+    spometFind: (phrase, indexNames) ->
+        indexes = Spomet.options.indexes
+        if indexNames?
+            indexes = Spomet.options.indexes.filter (e) ->
+                e.name in indexNames
+            
+        Spomet.find phrase, indexes
     spometAdd: (findable) ->
         Spomet.add findable
     spometRemove: (findable) ->
@@ -116,7 +123,7 @@ Meteor.publish 'documents', () ->
             'findable.version': 1
 
 #should be extended
-stopWords = ['there','this','that','them','then','and','the','any','all','other','und','ich','wir','sie','als']
+stopWords = ['there','not','this','that','them','then','and','the','any','all','other','und','ich','wir','sie','als']
 Meteor.publish 'common-terms', () ->
     Spomet.CommonTerms.find {tlength: {$gt: 2}, token: {$nin: stopWords}},
         sort: 
@@ -133,5 +140,6 @@ Meteor.publish 'common-terms', () ->
     
 Meteor.publish 'search-results', (opts) ->
     if opts?.phrase?
-        [selector, queryOpts] = Spomet.buildSearchQuery opts.phrase, opts.sort, opts.offset, opts.limit
+        [selector, queryOpts] = Spomet.buildSearchQuery opts
         Spomet.Searches.find selector, queryOpts
+        
