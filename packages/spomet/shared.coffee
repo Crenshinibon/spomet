@@ -19,7 +19,7 @@ Spomet.buildSearchQuery = (options) ->
     selector = {phraseHash: phraseHash}
     
     if options.excludes?
-        selector[base] = {$nin: options.excludes}
+        selector.base = {$nin: options.excludes}
     
     unless options.sort?
         options.sort = Spomet.options.sort
