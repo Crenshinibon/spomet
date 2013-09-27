@@ -131,7 +131,7 @@ Meteor.publish 'common-terms', () ->
         limit: Spomet.options.keywordsCount
             
     
-Meteor.publish 'search-results', (phrase, sort, offset, limit) ->
-    if phrase?
-        [selector, opts] = Spomet.buildSearchQuery phrase, sort, offset, limit
-        Spomet.Searches.find selector, opts
+Meteor.publish 'search-results', (opts) ->
+    if opts?.phrase?
+        [selector, queryOpts] = Spomet.buildSearchQuery opts.phrase, opts.sort, opts.offset, opts.limit
+        Spomet.Searches.find selector, queryOpts
