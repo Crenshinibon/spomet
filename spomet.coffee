@@ -10,7 +10,7 @@ if Meteor.isClient
         @score.toFixed 4
         
     Template.result.title = () ->
-        if @path isnt 'custom'
+        if @type isnt 'custom'
             p = Posts.findOne {_id: @base}
             if p? then p.title else 'deleted'
         else
@@ -18,7 +18,7 @@ if Meteor.isClient
             if c? then c.text.substring(0,10) + '...' else 'deleted'
         
     Template.result.text = () ->
-        if @path isnt 'custom'
+        if @type isnt 'custom'
             p = Posts.findOne {_id: @base}
             if p? then p.text else 'deleted'
         else
