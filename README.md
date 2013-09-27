@@ -22,7 +22,31 @@ Access the results, found by using the search box, through a call to:
 
     Spomet.defaultSearch.results()
 
-It returns a Meteor Collections Cursor.
+It returns a Meteor Collections Cursor, with objects of the following format:
+
+```coffee-script
+result =
+    phraseHash: 'eaf781efa' #phraseHash is a MD5 hashed representation of the search query
+    score: 1.99888111       #the score is an arbitrary number to provide a way to sort the results for relevance
+    type: 'idea'            #the type of the document, as provided by adding it
+    base: 'ae12f8'          #the document's id, as provided by adding it
+    version: 1              #the document's version, as provided by adding it
+    subDocs:                #subDocs stores the actual hits, grouped by path.
+        title:                  #This way every base document is only returned once.
+            path: 'title'           #the hits array contains every hit, with the matched string, 
+            docId: 'idea-ae12f8-title-1'    #the index used and the actual position in the document.
+            hits: [{indexName: 'threegram', token: ' me', pos: 1491 }, ...]
+            score: 1.09
+        decsription:
+            path: 'description'
+            docId: 'idea-ae12f8-description-1'
+            hits: [indexName: 'threegram', token: ' me', pos: 231 }, ...]
+            score: 0.90888111
+    queried: 'Thu Sep 26 2013 18:13:25 GMT+0200 (CEST)'     #the date when the search was triggered
+    interim: true   #a flag inidicating if this result is created on the client 
+                    #and wasn't yet populated with real results from the server
+```
+<script src="https://gist.github.com/Crenshinibon/6710149.js"></script>
 
 Add documents to the search by calling the method *add* with a *Spomet.Findable* instance:
 
