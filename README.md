@@ -3,7 +3,7 @@ Spomet
 
 Spomet is the contraction of Spotting Meteors.
 
-Test it [here](http://spomet.meteor.com/ "Spomet hosted at meteor.com")
+Test it [here](http://spomet.meteor.com/ "Spomet hosted at meteor.com") and read about an extended example of it's usage [here](http://shiggyenterprises.wordpress.com/2013/09/28/developing-a-full-text-search-enabled-meteor-app).
 
 It is a quite simple and limited fulltext search engine for [Meteor](http://meteor.com "Home of Meteor"). Besides it's simplicity it's sufficient for my purpose (and eventually for many other's). It should be easily includable into your Meteor project. Take the [spomet package](https://github.com/Crenshinibon/spomet/tree/master/packages/spomet "Spomet package") from this GitHub repository's *packages* folder and put it into your app's *packages* folder.
 
