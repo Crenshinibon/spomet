@@ -107,9 +107,8 @@ Meteor.methods
             Spomet.remove findable.docId
         else if findable?
             Spomet.remove findable
-    spometUpdate: (findale) ->
-        prevDocId = findable.previousVersionDocId()
-        Spomet.remove prevDocId
+    spometUpdate: (findable) ->
+        Spomet.remove findable.previousVersionDocId
         Spomet.add findable
 
 Meteor.publish 'documents', () ->

@@ -45,7 +45,6 @@ class Spomet.Findable
         unless version? then @version = 1
         unless type? then @type = 'default'
         @docId = @type + '-' + base + '-' + path + '-' + @version
-    previousVersionDocId: () ->
-        @type + '-' + @base + '-' + @path + '-' + (@version - 1)
+        @previousVersionDocId = @type + '-' + base + '-' + path + '-' + (@version - 1)
 
 @Index = {}
