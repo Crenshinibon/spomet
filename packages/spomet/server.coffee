@@ -68,25 +68,33 @@ cleanupSearches = () ->
 Spomet.add = (findable, callback) ->
     cleanupSearches()
     Spomet.Index.add findable, callback
-    
+ 
+ 
+removeTokens = (indexTokens) ->
+    result = {}
+    indexTokens.forEach (e) ->
+        id = e.indexName + e.token
+        result[id] = 
+            token: e.token
+            indexName: e.indexName
+    _.values result
+               
 Spomet.remove = (docId) ->
     cleanupSearches()
     doc = Spomet.Documents.collection.findOne {docId: docId}
     if doc?
-        removeTokens = (indexTokens) ->
-            result = {}
-            indexTokens.forEach (e) ->
-                id = e.indexName + e.token
-                result[id] = 
-                    token: e.token
-                    indexName: e.indexName
-            _.values result
-        
         removeTokens(doc.indexTokens).forEach (rToken) ->
             Spomet.Index.remove docId, rToken.indexName, rToken.token
         
         Spomet.Documents.collection.remove {_id: doc._id}
 
+Spomet.removeBase = (baseId) ->
+    cleanupSearches()
+    c = Spomet.Documents.collection.find {'findable.base': baseId}
+    c.forEach (e) ->
+        removeTokens(e.indexTokens).forEach (rToken) ->
+            Spomet.Index.remove e.docId, rToken.indexName, rToken.token
+        Spomet.Documents.collection.remove {_id: e._id}
 
 Spomet.reset = () ->
     cleanupSearches()
@@ -107,6 +115,8 @@ Meteor.methods
             Spomet.remove findable.docId
         else if findable?
             Spomet.remove findable
+    spometRemoveBase: (baseId) ->
+        Spomet.removeBase baseId
     spometUpdate: (findable) ->
         Spomet.remove findable.previousVersionDocId
         Spomet.add findable

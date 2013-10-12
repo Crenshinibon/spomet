@@ -1,4 +1,4 @@
-index = (findable, tokens, collection) ->
+indexTokens = (findable, tokens, collection) ->
     tokens.forEach (token) ->
         doc = 
             docId: findable.docId
@@ -18,8 +18,8 @@ index = (findable, tokens, collection) ->
                 documentsCount: 1, 
                 documents: [doc]
 
-tokenizeWithIndex = (index, text) ->
-    tokenizer = new index.Tokenizer
+tokenizeWithIndex = (ind, text) ->
+    tokenizer = new ind.Tokenizer
     text.split('').forEach (c, i) ->
         tokenizer.parseCharacter c, i
     tokenizer.finalize()
@@ -61,8 +61,8 @@ Index.add = (findable, callback) ->
         
     unless Documents.exists findable
         #init indexer for each index
-        tokenizers = Spomet.options.indexes.map (index) ->
-            new index.Tokenizer
+        tokenizers = Spomet.options.indexes.map (i) ->
+            new i.Tokenizer
             
         #normalize and tokenize over all indexes in one go
         findable.text.split('').forEach (c, pos) ->
@@ -71,8 +71,8 @@ Index.add = (findable, callback) ->
         
         tokenizers.forEach (t) ->
             t.finalize()
-            index findable, t.tokens, t.collection
-        
+            indexTokens findable, t.tokens, t.collection
+            
         Documents.add findable, tokenizers.map((i) -> i.tokens).reduce (s, a) -> s.concat a
         callback? findable.docId, 'Document added to all indexes'
     else
@@ -92,8 +92,8 @@ Index.setup = () ->
     
     
 Index.remove = (docId, indexName, remToken) ->
-    index = i for i in Spomet.options.indexes when i.name is indexName
-    index.collection.update {token: remToken},
+    ind = i for i in Spomet.options.indexes when i.name is indexName
+    ind.collection.update {token: remToken},
         $pull: {documents: {docId: docId}}
         $inc: {documentsCount: -1}
             

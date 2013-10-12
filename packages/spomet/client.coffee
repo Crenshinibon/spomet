@@ -11,6 +11,9 @@ Spomet.update = (findable) ->
 Spomet.remove = (findable) ->
     Meteor.call 'spometRemove', findable, () ->
 
+Spomet.removeBase = (baseId) ->
+    Meteor.call 'spometRemoveBase', baseId, () ->
+
 class Spomet.Search
     
     constructor: () ->
