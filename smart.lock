@@ -1,0 +1,15 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "spomet": {
+        "path": "../spomet-pkg"
+      }
+    },
+    "packages": {
+      "spomet": {
+        "path": "../spomet-pkg"
+      }
+    }
+  }
+}
