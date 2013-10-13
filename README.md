@@ -9,8 +9,12 @@ It is a quite simple and limited fulltext search engine for [Meteor](http://mete
 
 It should be easily includable into your Meteor project. I haven't made a meteorite package from it yet, though. So you have to:
 
-* Take the [spomet package](https://github.com/Crenshinibon/spomet/tree/master/packages/spomet "Spomet package") from this GitHub repository's *packages* folder and put it into your app's *packages* folder.
+* Take the [spomet package](https://github.com/Crenshinibon/spomet-pkg "Spomet package") from it's own GitHub into your app's *packages* folder.
 * Execute: *meteor add spomet*
+
+Alternatively you can use [Meteorite](https://atmosphere.meteor.com). And add spomet with:
+    
+    mrt add spomet
 
 This repository is itself a Meteor app and should serve as an example, of how to actually use Spomet. 
 
