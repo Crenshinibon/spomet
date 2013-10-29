@@ -5,9 +5,18 @@ suite 'Client Find', () ->
         server.eval () ->
             Spomet.reset()
             
-            e1 = new Spomet.Findable 'this should be easily found', '/', 'OID1', 1
-            e2 = new Spomet.Findable 'much more harder to find', '/', 'OID2', 1
-            e3 = new Spomet.Findable 'more harder to find, is that really the case', '/', 'OID3', 1
+            e1 = 
+                text: 'this should be easily found'
+                path: '/', 
+                base: 'OID1'
+            e2 = 
+                text: 'much more harder to find'
+                path: '/'
+                base: 'OID2'
+            e3 = 
+                text: 'more harder to find, is that really the case'
+                path: '/'
+                base: 'OID3'
             
             Spomet.add e1
             Spomet.add e2

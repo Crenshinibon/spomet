@@ -27,9 +27,17 @@ if Meteor.isClient
         
     Template.addable.events
         'click input' : () ->
-            Spomet.add new Spomet.Findable this.title, '/title', this._id, 'post', 1
-            Spomet.add new Spomet.Findable this.text, '/text', this._id, 'post', 1
-            Posts.update {_id: this._id},{$set: {indexed: true}}
+            Spomet.add 
+                text: @title
+                path: '/title'
+                base: @_id 
+                type: 'post'
+            Spomet.add 
+                text: @text
+                path: '/text'
+                base: @_id 
+                type: 'post'
+            Posts.update {_id: @_id},{$set: {indexed: true}}
 
     Template.ownText.events
         'submit form': (e) ->
@@ -37,7 +45,11 @@ if Meteor.isClient
             tarea = $(e.target).find('textarea').first()
             text = tarea.val()
             id = CustomContent.insert {text: text}
-            Spomet.add new Spomet.Findable text, 'custom', id, 'custom', 1
+            Spomet.add 
+                text: text
+                path: 'custom'
+                base: id
+                type: 'custom'
             tarea.val ''
 
 

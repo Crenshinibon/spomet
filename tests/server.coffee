@@ -7,11 +7,24 @@ suite 'Server Find', () ->
         server.eval () ->
             Spomet.reset()
             
-            e1 = new Spomet.Findable 'this is should be easily found', '/', 'OID1', 'post', 1
+            e1 = 
+                text: 'this is should be easily found'
+                path: '/'
+                base: 'OID1'
+                type: 'post'
             Spomet.add e1
-            e2 = new Spomet.Findable 'this is is', '/', 'OID2', 'post', 1
+            
+            e2 = 
+                text: 'this is is'
+                base: 'OID2'
+                type: 'post'
             Spomet.add e2
-            e3 = new Spomet.Findable 'much more much more harder to find', '/', 'OID3', 'post', 1
+            
+            e3 = 
+                text: 'much more much more harder to find'
+                path: '/'
+                base: 'OID3'
+                type: 'post'
             Spomet.add e3
             
             emit 'tg1', Spomet.ThreeGramIndex.collection.find().fetch()
@@ -21,7 +34,8 @@ suite 'Server Find', () ->
             
             emit 'docCount1', Spomet.FullWordIndex.collection.findOne {token: 'is'}
             
-            Spomet.remove e2.docId
+            Spomet.remove 
+                base: e2.base
             
             emit 'tg2', Spomet.ThreeGramIndex.collection.find().fetch()
             emit 'fw2', Spomet.FullWordIndex.collection.find().fetch()
@@ -93,9 +107,19 @@ suite 'Server Find', () ->
         server.eval () ->
             Spomet.reset()
             
-            e1 = new Spomet.Findable 'this should be easily found', '/', 'OID1', 'post', 1
-            e2 = new Spomet.Findable 'harder to find', '/', 'OID2', 'post', 1
-            e3 = new Spomet.Findable 'much more harder to find', '/', 'OID3', 'post', 1
+            e1 = 
+                text: 'this should be easily found'
+                path: '/'
+                base: 'OID1'
+                type: 'post'
+            e2 = 
+                text: 'harder to find'
+                base: 'OID2'
+                type: 'post'
+            e3 = 
+                text: 'much more harder to find'
+                base: 'OID3'
+                type: 'post'
             
             Spomet.add e1
             Spomet.add e2

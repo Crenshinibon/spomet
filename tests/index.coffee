@@ -5,15 +5,20 @@ suite 'Index', () ->
         server.eval () ->
             Spomet.reset()
             
-            doc = new Spomet.Findable 'some simple text', '/', 'oid1', 'post', 1
-            Spomet.Index.add doc, (docId, message) ->
-                emit 'added', docId
+            doc = 
+                text: 'some simple text'
+                path: '/'
+                base: 'oid1'
+                type: 'post'
                 
-                emit 'threegram', Spomet.ThreeGramIndex.collection.find().fetch()
-                emit 'fullword', Spomet.FullWordIndex.collection.find().fetch()
-                emit 'wordgroup', Spomet.WordGroupIndex.collection.find().fetch()
-                emit 'custom', Spomet.CustomIndex.collection.find().fetch()
-                emit 'docs', Spomet.Documents.collection.find({meta: {$exists: false}}).fetch()
+            docSpec = Spomet.Index.add doc
+            emit 'added', Spomet._docId docSpec
+            
+            emit 'threegram', Spomet.ThreeGramIndex.collection.find().fetch()
+            emit 'fullword', Spomet.FullWordIndex.collection.find().fetch()
+            emit 'wordgroup', Spomet.WordGroupIndex.collection.find().fetch()
+            emit 'custom', Spomet.CustomIndex.collection.find().fetch()
+            emit 'docs', Spomet.Documents.collection.find({meta: {$exists: false}}).fetch()
                 
         server.once 'added', (docId) ->
             assert.equal docId, 'post-oid1-/-1'
@@ -33,7 +38,7 @@ suite 'Index', () ->
         server.once 'docs', (docs) ->
             assert.equal 1, docs.length
             assert.equal docs[0].docId, 'post-oid1-/-1'
-            assert.equal docs[0].findable.text, 'some simple text'
+            assert.equal docs[0].text, 'some simple text'
             
             iTokens = docs[0].indexTokens
             assert.equal iTokens.length, 25
@@ -43,11 +48,25 @@ suite 'Index', () ->
         server.eval () ->
             Spomet.reset()
             
-            doc1 = new Spomet.Findable 'can be found', '/', 'oid1', 'post', 1
+            doc1 = 
+                text: 'can be found'
+                path: '/'
+                base: 'oid1'
+                type: 'post'
             Spomet.Index.add doc1
-            doc2 = new Spomet.Findable 'this not', '/', 'oid2', 'post', 1
+            
+            doc2 = 
+                text: 'this not'
+                path: '/'
+                base: 'oid2'
+                type: 'post'
             Spomet.Index.add doc2
-            doc3 = new Spomet.Findable 'quite hard to find', '/', 'oid3', 'post', 1
+            
+            doc3 = 
+                text: 'quite hard to find'
+                path: '/'
+                base: 'oid3'
+                type: 'post'
             Spomet.Index.add doc3
             
             

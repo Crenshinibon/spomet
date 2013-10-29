@@ -18,8 +18,8 @@ Alternatively you can use [Meteorite](https://atmosphere.meteor.com). And add sp
 
 This repository is itself a Meteor app and should serve as an example, of how to actually use Spomet. 
 
-Get Started
-===========
+Searching
+=========
 
 I tried to make using the package as simple as possible:
 
@@ -57,37 +57,85 @@ result =
 ```
 <script src="https://gist.github.com/Crenshinibon/6710149.js"></script>
 
-Add documents to the search by calling the method *add* with a *Spomet.Findable* instance:
+Adding
+======
 
-    Spomet.add new Spomet.Findable text, path, base, type, rev
+Add documents to the search by calling the method *add* with a hash:
 
-* text
-    The first parameter is the text, to be indexed.
-* path
-    Part of the identifier, relative to the base. Useful to identify parts of the base document. E.g. attribute identifiers of the stored document.
-* base
-    The base path. E.g. the id of the document, whose text should be indexed.
-* type
-    The documents type. Might be useful to distinguish between different types of documents. 
-* rev
-    A revision number to support multiple version of a document.
-    
+´´´coffee-script
+Spomet.add 
+    text: 'this is some text that should be searchable'
+    path: '/description'
+    base: 'SOMEREFID'
+    type: 'post'
+´´´
 
-Advanced
+*text* and *base* are mandatory. *type* will be substituted with 'default' and *path* with '/' in case those are missing.
+
+Spomet provides a basic revisioning mechanism. A version number is incremented in case a document with the same identifying attributes is added.
+
+So in case there already exists a document with the same *path*, *base* and *type*, Spomet will add the new one nevertheless. The version number is increased by one. In case no document with the identifying parameters exists the revision number 1 will be used. 
+
+
+Replacing
+=========
+
+*Spomet.replace* is meant to add a new version of a document and remove a prior version of it. *replace* takes the same hash parameter like add. 
+
+´´´
+Spomet.replace
+        text: 'this is some other text'
+        path: '/description'
+        base: 'SOMEREFID'
+        type: 'post'
+´´´
+
+Only *base* and *text* are mandatory.
+
+Additionally there is an optional second parameter. An integer version number. There you can specify which version of the document might be removed in favor for the new one.
+
+If you omit the second parameter the latest version of the docmuent is deleted and the new one inserted.
+
+*replace* adds a document, even when there isn't a prior version. 
+
+In case you don't want to or don't need to handle different versions, you should always use *replace* instead of *add*. *replace* adds a document, even if there was no document removed.
+
+Removing
 ========
 
-You can delete documents from the search by calling *Spomet.remove* with a *Spomet.Findable* instance as the parameter or with the *docId*.
+You can remove documents by calling *Spomet.remove* with a hash parameter. *remove* reacts very flexible based on the attributes of the hash.
 
-    Spomet.remove 'post-id1234-description-2'
-    Spomet.remove new Spomet.Findable null, 'description', 'id1234', 'post', 2
+Basically it performs a search with the given parameters and removes all matching documents. Here are a few examples:
 
-You can update already indexed documents, dismissing the prior version.
+Remove all documents of type 'default':
 
-    Spomet.update new Spomet.Findable text, path, base, type, rev
-    
-The document, with *rev - 1* gets removed from the search as a result.
+    Spomet.remove
+        type: 'default'
 
-You can create your own searches by instantiating *Spomet.Search*.
+Remove all documents with a given base reference:
+
+    Spomet.remove
+        base: 'BASEREFID'
+
+Remove all documents with the give path:
+
+    Spomet.remove
+        path: '/description'
+
+Remove a specific version of a document:
+
+    Spomet.remove
+        type: 'default'
+        base: 'BASEREFID'
+        path: '/description'
+        version: 2
+
+You have to be careful, though. Missing out some parameter might result in the removal of more documenst than intended.
+
+Custom Search
+=============
+
+Despite the provided search box you might want to create your own searches. You can achieve this by instantiating *Spomet.Search*.
 
     mySearch = new Spomet.Search
     mySearch.find 'some text'
@@ -97,9 +145,9 @@ You can create your own searches by instantiating *Spomet.Search*.
 Technology
 ==========
 
-The current implementation uses four simple indexes. They are supposed to balance precision and recall. There haven't been any tests yet. So future updates might fine-tune the parameters and introduce further indexes.
+The current implementation uses four simple indexes. They are supposed to balance precision and recall. There haven't been many tests yet. So future updates might fine-tune the parameters and introduce further indexes.
 
-Currently there is a 3gram based index, a simple word index, a custom index and a wordgroup index. Whereas wordgroups are groups of two words.
+Currently there is a 3gram based index, a simple word index, a custom index (using four letter parts of words as tokens) and a wordgroup index. Whereas wordgroups are groups of two words.
 
 Future enhancements might include stemming, algorithm based (e.g. Porter) or based on a lexikon. As well as phonetics.
 
@@ -107,18 +155,32 @@ Furthermore is the implementation not very efficient, I fear. There is plenty of
 
 The server process handles the heavy lifting of indexing, finding and scoring the documents. 
 
-When there are many documents to index the server might stall. 
+When there are many documents to index or search the server might stall. 
 
-A future enhancement might include establishing a separate process (deployable on a different host) for the indexing. Client side indexing might not be doable, because of security considerations.
+A future enhancement might include establishing a separate process (deployable on a different host) for indexing. Client side indexing might not be doable, because of security considerations.
 
-If you experience performance issues you might want to disable certain Indexes, you should start with the 3Gram index.
+Controlling Indexes
+===================
 
-There are handy Meteor methods to achieve this:
+If you experience performance issues you might want to disable certain indexes. You should start with the 3Gram index.
+
+There are handy Meteor methods to disable indexes globally:
 
     Meteor.call 'disableThreeGramIndex'
     Meteor.call 'disableCustomIndex'
     Meteor.call 'disableWordGroupIndex'
     Meteor.call 'disableFullWordIndex'
+    
+Besides the ability to disable indexes in general - e.g. not using them while indexing **and** searching. You can disable indexes per search. 
+
+You set the indexes to be used during search by calling *setIndexNames* on the *Search* object your are using. As the only parameter of this methods Spomet expects an array of index names.
+
+    mySearch = new Spomet.Search
+    mySearch.setIndexNames ['fullword','custom']
+    mySearch.find 'some text'
+    mySearch.results()
+
+The index's names are: 'fullword', 'wordgroup', 'threegram' and 'custom'
 
 Tests
 =====
@@ -129,7 +191,7 @@ Run the tests from the project's root folder with:
 
     laika --compilers coffee:coffee-script
 
-Note: There might be some false errors, indicating some curly braces problem, when you run all tests at once.
+**Note:** There might be some false errors, indicating some curly braces problem, when you run all tests at once.
 
 Warning
 =======
