@@ -36,6 +36,8 @@ Contributions
 
 You are free to send me additions and corrections via pull requests. Or to use the code as inspiration and/or basis for your own implementation.
 
+[![Hack Crenshinibon/spomet on Nitrous](https://d3o0mnbgv6k92a.cloudfront.net/assets/hack-l-v1-4b6757c3247e3c50314390ece34cdb11.png)](https://www.nitrous.io/hack_button?source=embed&runtime=meteor&repo=Crenshinibon%2Fspomet&file_to_open=README.md)
+
 License
 =======
 
